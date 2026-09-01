@@ -4,18 +4,28 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.lifecycleScope
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.herrhythm.app.data.*
 import com.herrhythm.app.ui.screens.*
-import com.herrhythm.app.ui.theme.HerRhythmTheme
-import com.herrhythm.app.ui.theme.RosePrimary
-import com.herrhythm.app.ui.theme.TextMuted
+import com.herrhythm.app.ui.theme.*
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
@@ -104,7 +114,6 @@ fun MainAppContainer(
     telegramAlertManager: TelegramAlertManager,
     nyraEngine: NyraAgentEngine
 ) {
-    // Persistent onboarding state
     var isOnboardingCompleted by remember {
         mutableStateOf(storageManager.isOnboardingCompleted())
     }
@@ -116,7 +125,7 @@ fun MainAppContainer(
                 dateOfBirth = "14/05/2000",
                 weightKg = 55.0f,
                 hasWatch = true,
-                fitnessGoal = "Energy & Recovery"
+                fitnessGoal = "Track my period"
             )
         )
     }
@@ -125,11 +134,13 @@ fun MainAppContainer(
         mutableStateOf(storageManager.getSafetySettings())
     }
 
-    var selectedTab by remember { mutableStateOf("Home") }
+    var selectedTab by remember { mutableStateOf("Today") } // Today, Calendar, Self Care, Analysis, NYRA, Settings
     var activeRunningSession by remember { mutableStateOf<WorkoutSession?>(null) }
     var showLogPeriodDialog by remember { mutableStateOf(false) }
     var showGynaecologistScreen by remember { mutableStateOf(false) }
     var showFakeCallScreen by remember { mutableStateOf(false) }
+    var showQuickActionSheet by remember { mutableStateOf(false) }
+    var showSettingsScreen by remember { mutableStateOf(false) }
 
     val coroutineScope = rememberCoroutineScope()
     val context = androidx.compose.ui.platform.LocalContext.current
@@ -215,6 +226,90 @@ fun MainAppContainer(
         )
     }
 
+    // 5. Floating Center '+' Quick Action Menu Dialog
+    if (showQuickActionSheet) {
+        AlertDialog(
+            onDismissRequest = { showQuickActionSheet = false },
+            containerColor = PookieCardBg,
+            title = {
+                Text(
+                    text = "Quick Actions 🌸",
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp
+                )
+            },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    // Log Period
+                    Button(
+                        onClick = {
+                            showQuickActionSheet = false
+                            showLogPeriodDialog = true
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = PookiePinkPrimary),
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("🩸 Log Period / Symptoms", color = Color.White, fontWeight = FontWeight.Bold)
+                    }
+
+                    // Safe Exit Fake Call
+                    Button(
+                        onClick = {
+                            showQuickActionSheet = false
+                            showFakeCallScreen = true
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2C3E50)),
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("📞 Fake Call (${safetySettings.fakeCallerName})", color = Color.White, fontWeight = FontWeight.Bold)
+                    }
+
+                    // Emergency SOS
+                    Button(
+                        onClick = {
+                            showQuickActionSheet = false
+                            coroutineScope.launch {
+                                val result = telegramAlertManager.sendSosAlert(
+                                    userProfile = userProfile,
+                                    safetySettings = safetySettings,
+                                    reason = "Emergency SOS sent via Quick Actions",
+                                    healthSnapshot = liveSnapshot
+                                )
+                                Toast.makeText(context, result.responseMessage, Toast.LENGTH_LONG).show()
+                            }
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE53935)),
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("🚨 Emergency SOS Broadcast", color = Color.White, fontWeight = FontWeight.Bold)
+                    }
+
+                    // Consult Gynaecologist
+                    Button(
+                        onClick = {
+                            showQuickActionSheet = false
+                            showGynaecologistScreen = true
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = PookieLavender),
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("👩‍⚕️ Consult Gynaecologists", color = Color.White, fontWeight = FontWeight.Bold)
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { showQuickActionSheet = false }) {
+                    Text("Close", color = PookieTextMuted)
+                }
+            }
+        )
+    }
+
     // Onboarding flow (only shown once, saved to phone memory)
     if (!isOnboardingCompleted) {
         OnboardingScreen(
@@ -224,7 +319,6 @@ fun MainAppContainer(
                 storageManager.setOnboardingCompleted(true)
                 nyraEngine.setUserProfile(profile)
 
-                // Parse onboarding cycle start date
                 val startDate = try {
                     val parts = profile.lastPeriodStart.split("/")
                     if (parts.size == 3) {
@@ -250,60 +344,132 @@ fun MainAppContainer(
         )
     } else {
         Scaffold(
+            containerColor = PookieDarkBg,
             bottomBar = {
-                NavigationBar(
-                    containerColor = com.herrhythm.app.ui.theme.CreamCard,
-                    contentColor = RosePrimary
+                // POOKIE CAT REFERENCE BOTTOM NAVIGATION BAR
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(PookieNavBg)
+                        .padding(vertical = 4.dp)
                 ) {
-                    val tabs = listOf(
-                        "Home" to Icons.Default.Home,
-                        "Health" to Icons.Default.Favorite,
-                        "Fitness" to Icons.Default.FitnessCenter,
-                        "NYRA" to Icons.Default.AutoAwesome,
-                        "Profile" to Icons.Default.Person
-                    )
-
-                    tabs.forEach { (label, icon) ->
-                        val isSelected = selectedTab == label
-                        NavigationBarItem(
-                            selected = isSelected,
-                            onClick = { selectedTab = label },
-                            icon = {
-                                Icon(
-                                    icon,
-                                    contentDescription = label,
-                                    tint = if (isSelected) RosePrimary else TextMuted
-                                )
-                            },
-                            label = {
-                                Text(
-                                    label,
-                                    color = if (isSelected) RosePrimary else TextMuted
-                                )
-                            },
-                            colors = NavigationBarItemDefaults.colors(
-                                indicatorColor = com.herrhythm.app.ui.theme.SoftRose
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 8.dp),
+                        horizontalArrangement = Arrangement.SpaceAround,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        // 1. Today
+                        val isToday = selectedTab == "Today"
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier
+                                .clickable { selectedTab = "Today" }
+                                .padding(horizontal = 8.dp, vertical = 4.dp)
+                        ) {
+                            Icon(
+                                Icons.Default.Brightness5,
+                                contentDescription = "Today",
+                                tint = if (isToday) PookiePinkPrimary else PookieTextMuted,
+                                modifier = Modifier.size(24.dp)
                             )
-                        )
+                            Spacer(modifier = Modifier.height(2.dp))
+                            Text("Today", fontSize = 10.sp, color = if (isToday) PookiePinkPrimary else PookieTextMuted, fontWeight = if (isToday) FontWeight.Bold else FontWeight.Normal)
+                        }
+
+                        // 2. Calendar
+                        val isCalendar = selectedTab == "Calendar"
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier
+                                .clickable { selectedTab = "Calendar" }
+                                .padding(horizontal = 8.dp, vertical = 4.dp)
+                        ) {
+                            Icon(
+                                Icons.Default.CalendarMonth,
+                                contentDescription = "Calendar",
+                                tint = if (isCalendar) PookiePinkPrimary else PookieTextMuted,
+                                modifier = Modifier.size(24.dp)
+                            )
+                            Spacer(modifier = Modifier.height(2.dp))
+                            Text("Calendar", fontSize = 10.sp, color = if (isCalendar) PookiePinkPrimary else PookieTextMuted, fontWeight = if (isCalendar) FontWeight.Bold else FontWeight.Normal)
+                        }
+
+                        // 3. CENTER BIG FLOATING '+' BUTTON
+                        Box(
+                            modifier = Modifier
+                                .offset(y = (-10).dp)
+                                .size(52.dp)
+                                .shadow(10.dp, CircleShape, spotColor = PookiePinkPrimary)
+                                .clip(CircleShape)
+                                .background(PookiePinkPrimary)
+                                .clickable { showQuickActionSheet = true },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(Icons.Default.Add, contentDescription = "Add", tint = Color.White, modifier = Modifier.size(28.dp))
+                        }
+
+                        // 4. Self Care
+                        val isSelfCare = selectedTab == "Self Care"
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier
+                                .clickable { selectedTab = "Self Care" }
+                                .padding(horizontal = 8.dp, vertical = 4.dp)
+                        ) {
+                            Icon(
+                                Icons.Default.Favorite,
+                                contentDescription = "Self Care",
+                                tint = if (isSelfCare) PookiePinkPrimary else PookieTextMuted,
+                                modifier = Modifier.size(24.dp)
+                            )
+                            Spacer(modifier = Modifier.height(2.dp))
+                            Text("Self Care", fontSize = 10.sp, color = if (isSelfCare) PookiePinkPrimary else PookieTextMuted, fontWeight = if (isSelfCare) FontWeight.Bold else FontWeight.Normal)
+                        }
+
+                        // 5. Analysis
+                        val isAnalysis = selectedTab == "Analysis"
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier
+                                .clickable { selectedTab = "Analysis" }
+                                .padding(horizontal = 8.dp, vertical = 4.dp)
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(12.dp))
+                                    .background(if (isAnalysis) PookiePinkCard else Color.Transparent)
+                                    .padding(horizontal = 10.dp, vertical = 2.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    Icons.Default.BarChart,
+                                    contentDescription = "Analysis",
+                                    tint = if (isAnalysis) PookiePinkText else PookieTextMuted,
+                                    modifier = Modifier.size(22.dp)
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(2.dp))
+                            Text("Analysis", fontSize = 10.sp, color = if (isAnalysis) PookiePinkPrimary else PookieTextMuted, fontWeight = if (isAnalysis) FontWeight.Bold else FontWeight.Normal)
+                        }
                     }
                 }
             }
         ) { innerPadding ->
             Box(modifier = Modifier.padding(innerPadding)) {
                 when (selectedTab) {
-                    "Home" -> HomeScreen(
+                    "Today" -> HomeScreen(
                         userProfile = userProfile,
                         cycleInfo = cycleRepository.getCycleInfo(),
                         healthSnapshot = liveSnapshot,
                         reminders = activeReminders,
                         onOpenNyraChat = { selectedTab = "NYRA" },
-                        onOpenHealthDetail = { selectedTab = "Health" },
+                        onOpenHealthDetail = { selectedTab = "Analysis" },
                         onOpenWatchManager = { selectedTab = "Profile" },
                         onOpenGynaecologists = { showGynaecologistScreen = true },
                         onOpenLogPeriodDialog = { showLogPeriodDialog = true },
-                        onTriggerFakeCall = {
-                            showFakeCallScreen = true
-                        },
+                        onTriggerFakeCall = { showFakeCallScreen = true },
                         onTriggerSos = {
                             coroutineScope.launch {
                                 val result = telegramAlertManager.sendSosAlert(
@@ -316,18 +482,34 @@ fun MainAppContainer(
                             }
                         }
                     )
-                    "Health" -> HealthScreen(
-                        snapshot = liveSnapshot
+                    "Calendar" -> CalendarScreen(
+                        cycleInfo = cycleRepository.getCycleInfo(),
+                        onBackClick = { selectedTab = "Today" }
                     )
-                    "Fitness" -> FitnessScreen(
+                    "Self Care" -> FitnessScreen(
                         snapshot = liveSnapshot,
                         fitnessRepository = fitnessRepository,
-                        onStartWorkout = { session ->
-                            activeRunningSession = session
-                        },
+                        onStartWorkout = { session -> activeRunningSession = session },
                         onGenerateWorkout = {
                             nyraEngine.sendMessage("Generate a custom 30 min workout plan for my current energy level")
                             selectedTab = "NYRA"
+                        }
+                    )
+                    "Analysis" -> AnalysisScreen(
+                        userProfile = userProfile,
+                        cycleInfo = cycleRepository.getCycleInfo(),
+                        healthSnapshot = liveSnapshot,
+                        onOpenSettings = { selectedTab = "Profile" },
+                        onOpenLogPeriod = { showLogPeriodDialog = true },
+                        onTogglePregnancy = { enabled ->
+                            val updated = userProfile.copy(isPregnancyModeEnabled = enabled)
+                            userProfile = updated
+                            storageManager.saveUserProfile(updated)
+                        },
+                        onUpdateWeight = { newWeight ->
+                            val updated = userProfile.copy(weightKg = newWeight)
+                            userProfile = updated
+                            storageManager.saveUserProfile(updated)
                         }
                     )
                     "NYRA" -> NyraScreen(
@@ -346,9 +528,7 @@ fun MainAppContainer(
                             storageManager.saveSafetySettings(updated)
                             nyraEngine.setSafetySettings(updated)
                         },
-                        onTriggerFakeCall = {
-                            showFakeCallScreen = true
-                        },
+                        onTriggerFakeCall = { showFakeCallScreen = true },
                         onTestTelegramAlert = { updatedSettings ->
                             coroutineScope.launch {
                                 val res = telegramAlertManager.sendSosAlert(

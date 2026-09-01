@@ -1,5 +1,7 @@
 package com.herrhythm.app.ui.screens
 
+import androidx.compose.animation.core.*
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -15,17 +17,26 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.herrhythm.app.R
 import com.herrhythm.app.data.CycleInfo
 import com.herrhythm.app.data.HealthSnapshot
 import com.herrhythm.app.data.PeriodCalculator
 import com.herrhythm.app.data.UserProfile
 import com.herrhythm.app.ui.theme.*
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun HomeScreen(
@@ -45,56 +56,402 @@ fun HomeScreen(
     val daysUntilNext = PeriodCalculator.getDaysUntilNextPeriod(cycleInfo)
     val pregnancyChance = PeriodCalculator.getChanceOfPregnancy(cycleInfo, LocalDate.now())
 
+    // Format dates for fertility & ovulation cards
+    val ovulationDate = cycleInfo.nextPeriodDate.minusDays(14)
+    val fertilityStart = ovulationDate.minusDays(4)
+    val fertilityEnd = ovulationDate.plusDays(1)
+    val dateFormatter = DateTimeFormatter.ofPattern("d MMM")
+
+    // Interactive speech bubble for the cute pookie cat mascot
+    var catQuoteIndex by remember { mutableIntStateOf(0) }
+    val catQuotes = listOf(
+        "You're doing amazing, bestie! 🌸",
+        "Don't forget to drink water! 💧",
+        "Rest and be kind to yourself 💕",
+        "Purr... NYRA & I are here for you! ✨",
+        "Listen to your body today 🌸"
+    )
+
+    // Gentle floating animation for Pookie Cat
+    val infiniteTransition = rememberInfiniteTransition(label = "catFloat")
+    val catBounce by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = -6f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1200, easing = EaseInOutQuad),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "catBounce"
+    )
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(CreamBg)
+            .background(PookieDarkBg)
             .verticalScroll(scrollState)
-            .padding(20.dp)
+            .padding(horizontal = 20.dp, vertical = 16.dp)
     ) {
-        // 1. Top Header & Greeting
+        // ─────────────────────────────────────────────
+        // 1. TOP HEADER (SETTINGS GEAR + PREGNANCY CHANCE BADGE + NYRA AI)
+        // ─────────────────────────────────────────────
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 8.dp, bottom = 12.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Column {
-                Text(
-                    text = "Good morning, ${userProfile.name} 👋",
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = TextPrimary
-                )
-                Text(
-                    text = "Day ${cycleInfo.currentCycleDay} • ${cycleInfo.currentPhase.displayName}",
-                    fontSize = 13.sp,
-                    color = RosePrimary,
-                    fontWeight = FontWeight.SemiBold
-                )
+            IconButton(
+                onClick = onOpenWatchManager,
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(CircleShape)
+                    .background(PookieCardBg)
+            ) {
+                Icon(Icons.Default.Settings, contentDescription = "Settings", tint = Color.White, modifier = Modifier.size(22.dp))
             }
 
-            // Watch Connection Indicator Badge
-            Box(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(20.dp))
-                    .border(1.dp, PeachBorder, RoundedCornerShape(20.dp))
-                    .background(CreamCard)
-                    .clickable { onOpenWatchManager() }
-                    .padding(horizontal = 12.dp, vertical = 6.dp)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                // Pregnancy Chance Indicator Tag
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(20.dp))
+                        .background(PookieCardBg)
+                        .padding(horizontal = 14.dp, vertical = 6.dp)
+                ) {
+                    Text(
+                        text = "$pregnancyChance chance of pregnancy",
+                        fontSize = 12.sp,
+                        color = Color.White.copy(alpha = 0.85f),
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                // NYRA AI Chat Button with Sparkles
+                IconButton(
+                    onClick = onOpenNyraChat,
+                    modifier = Modifier
+                        .size(40.dp)
+                        .clip(CircleShape)
+                        .background(
+                            Brush.linearGradient(listOf(PookiePinkPrimary, PookieLavender))
+                        )
+                ) {
+                    Icon(Icons.Default.AutoAwesome, contentDescription = "NYRA AI", tint = Color.White, modifier = Modifier.size(20.dp))
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // ─────────────────────────────────────────────
+        // 2. HERO SECTION (PERIOD DAYS LEFT + POOKIE CAT MASCOT)
+        // ─────────────────────────────────────────────
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(24.dp))
+                .background(
+                    Brush.radialGradient(
+                        colors = listOf(PookieCardLight.copy(alpha = 0.8f), PookieCardBg),
+                        radius = 600f
+                    )
+                )
+                .padding(20.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                // Left text & "Period Starts" action button
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = "Period",
+                        fontSize = 15.sp,
+                        color = PookieTextMuted,
+                        fontWeight = FontWeight.Medium
+                    )
+
+                    Spacer(modifier = Modifier.height(4.dp))
+
+                    Text(
+                        text = if (daysUntilNext <= 0) "TODAY" else "$daysUntilNext DAYS LEFT",
+                        fontSize = 28.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = Color.White,
+                        letterSpacing = 0.5.sp
+                    )
+
+                    Spacer(modifier = Modifier.height(4.dp))
+
+                    Text(
+                        text = "${cycleInfo.nextPeriodDate.format(DateTimeFormatter.ofPattern("dd MMM"))} - Next Period",
+                        fontSize = 13.sp,
+                        color = Color.White.copy(alpha = 0.7f)
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // "Period Starts" Hot Pink Pill Button
+                    Button(
+                        onClick = onOpenLogPeriodDialog,
+                        colors = ButtonDefaults.buttonColors(containerColor = PookiePinkPrimary),
+                        shape = RoundedCornerShape(24.dp),
+                        contentPadding = PaddingValues(horizontal = 22.dp, vertical = 10.dp),
+                        modifier = Modifier.shadow(8.dp, RoundedCornerShape(24.dp), spotColor = PookiePinkPrimary)
+                    ) {
+                        Text(
+                            text = "Period Starts",
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
+                        )
+                    }
+                }
+
+                // Right Cute Pookie Cat Mascot Companion
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier
+                        .offset(y = catBounce.dp)
+                        .clickable {
+                            catQuoteIndex = (catQuoteIndex + 1) % catQuotes.size
+                        }
+                ) {
+                    // Floating speech bubble
                     Box(
                         modifier = Modifier
-                            .size(8.dp)
-                            .clip(CircleShape)
-                            .background(if (healthSnapshot.isWatchConnected) HealthGreen else HealthOrange)
-                    )
-                    Spacer(modifier = Modifier.width(6.dp))
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(Color.White)
+                            .padding(horizontal = 8.dp, vertical = 4.dp)
+                    ) {
+                        Text(
+                            text = catQuotes[catQuoteIndex],
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = PookieTextDark,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(6.dp))
+
+                    Box(
+                        modifier = Modifier
+                            .size(115.dp)
+                            .clip(RoundedCornerShape(20.dp)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.pookie_cat),
+                            contentDescription = "Cute Pookie Cat Companion",
+                            contentScale = ContentScale.Fit,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(18.dp))
+
+        // ─────────────────────────────────────────────
+        // 3. 3 HORIZONTAL CYCLE CARDS (CYCLE DAY, FERTILITY, OVULATION)
+        // ─────────────────────────────────────────────
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            // Card 1: CYCLE DAY with circular progress ring
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .height(130.dp)
+                    .clip(RoundedCornerShape(20.dp))
+                    .background(PookieLavenderCard)
+                    .padding(12.dp)
+            ) {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.SpaceBetween,
+                    horizontalAlignment = Alignment.Start
+                ) {
                     Text(
-                        text = if (healthSnapshot.isWatchConnected) "Watch Synced" else "Demo Mode",
+                        text = "CYCLE\nDAY",
                         fontSize = 11.sp,
-                        color = TextSecondary,
-                        fontWeight = FontWeight.Medium
+                        fontWeight = FontWeight.ExtraBold,
+                        color = PookieLavenderText,
+                        lineHeight = 14.sp
+                    )
+
+                    // Circular Progress Ring
+                    Box(
+                        modifier = Modifier
+                            .size(54.dp)
+                            .align(Alignment.CenterHorizontally),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        androidx.compose.foundation.Canvas(modifier = Modifier.fillMaxSize()) {
+                            // Background track
+                            drawCircle(
+                                color = Color.White.copy(alpha = 0.8f),
+                                style = Stroke(width = 5.dp.toPx())
+                            )
+                            // Animated sweep progress
+                            val sweep = (cycleInfo.currentCycleDay.toFloat() / cycleInfo.cycleLengthDays.toFloat()) * 360f
+                            drawArc(
+                                brush = Brush.sweepGradient(listOf(PookiePinkPrimary, PookieLavender)),
+                                startAngle = -90f,
+                                sweepAngle = sweep,
+                                useCenter = false,
+                                style = Stroke(width = 5.dp.toPx(), cap = StrokeCap.Round)
+                            )
+                        }
+                        Text(
+                            text = "${cycleInfo.currentCycleDay}",
+                            fontSize = 17.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = PookieTextDark
+                        )
+                    }
+                }
+            }
+
+            // Card 2: FERTILITY WINDOW (Soft Yellow)
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .height(130.dp)
+                    .clip(RoundedCornerShape(20.dp))
+                    .background(PookiePastelYellow)
+                    .padding(12.dp)
+            ) {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Column {
+                        Text(
+                            text = "Fertility Window",
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = PookieYellowText
+                        )
+                        Spacer(modifier = Modifier.height(2.dp))
+                        Text(
+                            text = "${fertilityStart.format(dateFormatter)} - ${fertilityEnd.format(dateFormatter)}",
+                            fontSize = 10.sp,
+                            color = PookieYellowText.copy(alpha = 0.8f)
+                        )
+                    }
+
+                    // Sprout Icon
+                    Box(
+                        modifier = Modifier.align(Alignment.End)
+                    ) {
+                        Text("🌱", fontSize = 28.sp)
+                    }
+                }
+            }
+
+            // Card 3: OVULATION (Soft Peach)
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .height(130.dp)
+                    .clip(RoundedCornerShape(20.dp))
+                    .background(PookiePastelPeach)
+                    .padding(12.dp)
+            ) {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Column {
+                        Text(
+                            text = "Ovulation",
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = PookiePeachText
+                        )
+                        Spacer(modifier = Modifier.height(2.dp))
+                        Text(
+                            text = ovulationDate.format(dateFormatter),
+                            fontSize = 10.sp,
+                            color = PookiePeachText.copy(alpha = 0.8f)
+                        )
+                    }
+
+                    // Ovulation Sparkle/Egg Icon
+                    Box(
+                        modifier = Modifier.align(Alignment.End)
+                    ) {
+                        Text("✨🥚", fontSize = 22.sp)
+                    }
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(18.dp))
+
+        // ─────────────────────────────────────────────
+        // 4. "HOW ARE YOU FEELING TODAY?" CARD WITH SLEEPING SUN/MOON
+        // ─────────────────────────────────────────────
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(22.dp))
+                .background(PookieCardBg)
+                .padding(18.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = "How are you feeling today?",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = "Tell us more about your body to get analysis",
+                        fontSize = 11.sp,
+                        color = PookieTextMuted,
+                        lineHeight = 15.sp
+                    )
+                    Spacer(modifier = Modifier.height(14.dp))
+
+                    Button(
+                        onClick = onOpenLogPeriodDialog,
+                        colors = ButtonDefaults.buttonColors(containerColor = PookieLavender),
+                        shape = RoundedCornerShape(20.dp),
+                        contentPadding = PaddingValues(horizontal = 18.dp, vertical = 8.dp)
+                    ) {
+                        Text("Add Symptom", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                    }
+                }
+
+                Spacer(modifier = Modifier.width(12.dp))
+
+                // Sleeping Sun & Moon illustration
+                Box(
+                    modifier = Modifier
+                        .size(85.dp)
+                        .clip(RoundedCornerShape(16.dp)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.cute_moon_sun),
+                        contentDescription = "Mood Mascot",
+                        contentScale = ContentScale.Fit,
+                        modifier = Modifier.fillMaxSize()
                     )
                 }
             }
@@ -102,37 +459,37 @@ fun HomeScreen(
 
         Spacer(modifier = Modifier.height(18.dp))
 
-        // 2. WOMEN SAFETY & SAFE EXIT QUICK CARD
-        GlassCard(modifier = Modifier.fillMaxWidth()) {
-            Column(modifier = Modifier.padding(16.dp)) {
+        // ─────────────────────────────────────────────
+        // 5. WOMEN SAFETY & EMERGENCY SHIELD (FAKE CALL & SOS)
+        // ─────────────────────────────────────────────
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(20.dp))
+                .background(PookieCardBg)
+                .padding(16.dp)
+        ) {
+            Column {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Box(
-                            modifier = Modifier
-                                .size(28.dp)
-                                .clip(CircleShape)
-                                .background(Color(0xFFFFECEC)),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text("🛡️", fontSize = 14.sp)
-                        }
+                        Text("🛡️", fontSize = 16.sp)
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = "Safety & Safe Exit Shield",
                             fontWeight = FontWeight.Bold,
                             fontSize = 14.sp,
-                            color = TextPrimary
+                            color = Color.White
                         )
                     }
                     Text(
-                        text = "Instant ⚡",
-                        fontSize = 11.sp,
+                        text = "1-Tap Quick Action ⚡",
+                        fontSize = 10.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFFE53935)
+                        color = PookiePinkPrimary
                     )
                 }
 
@@ -142,32 +499,30 @@ fun HomeScreen(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    // Safe Exit Fake Call Button
                     Button(
                         onClick = onTriggerFakeCall,
                         modifier = Modifier
                             .weight(1f)
-                            .height(44.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2C3E50)),
+                            .height(42.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = PookieCardLight),
                         shape = RoundedCornerShape(12.dp),
                         contentPadding = PaddingValues(horizontal = 8.dp)
                     ) {
-                        Icon(Icons.Default.Call, contentDescription = null, tint = Color.White, modifier = Modifier.size(16.dp))
+                        Icon(Icons.Default.Call, contentDescription = null, tint = Color.White, modifier = Modifier.size(15.dp))
                         Spacer(modifier = Modifier.width(6.dp))
                         Text("Fake Call (Bhai) 📞", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color.White)
                     }
 
-                    // Emergency SOS Alert Button
                     Button(
                         onClick = onTriggerSos,
                         modifier = Modifier
                             .weight(1f)
-                            .height(44.dp),
+                            .height(42.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE53935)),
                         shape = RoundedCornerShape(12.dp),
                         contentPadding = PaddingValues(horizontal = 8.dp)
                     ) {
-                        Icon(Icons.Default.Warning, contentDescription = null, tint = Color.White, modifier = Modifier.size(16.dp))
+                        Icon(Icons.Default.Warning, contentDescription = null, tint = Color.White, modifier = Modifier.size(15.dp))
                         Spacer(modifier = Modifier.width(6.dp))
                         Text("SOS Location 🚨", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color.White)
                     }
@@ -177,299 +532,79 @@ fun HomeScreen(
 
         Spacer(modifier = Modifier.height(18.dp))
 
-        // 3. LIVE MENSTRUAL CYCLE RING HERO CARD
-        GlassCard(modifier = Modifier.fillMaxWidth()) {
-            Column(modifier = Modifier.padding(18.dp)) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text("🌸", fontSize = 18.sp)
-                            Spacer(modifier = Modifier.width(6.dp))
-                            Text(cycleInfo.currentPhase.displayName, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = RosePrimary)
-                        }
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            text = if (daysUntilNext <= 0) "Period is expected today 💕"
-                            else "Period in $daysUntilNext days (${cycleInfo.nextPeriodDate})",
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            color = TextPrimary
-                        )
-                        Text(
-                            text = "Pregnancy Chance: $pregnancyChance • Cycle Day ${cycleInfo.currentCycleDay}/${cycleInfo.cycleLengthDays}",
-                            fontSize = 11.sp,
-                            color = TextSecondary
-                        )
-                    }
-
-                    // Circular Phase Progress Badge
-                    Box(
-                        modifier = Modifier
-                            .size(68.dp)
-                            .clip(CircleShape)
-                            .background(Brush.radialGradient(listOf(SoftRose, CardSurface)))
-                            .border(3.dp, RosePrimary, CircleShape),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text("Day", fontSize = 10.sp, color = TextMuted)
-                            Text("${cycleInfo.currentCycleDay}", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = RosePrimary)
-                        }
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                // Phase description advice
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(10.dp))
-                        .background(WarmSurface)
-                        .padding(10.dp)
-                ) {
-                    Text(
-                        text = "💡 ${cycleInfo.currentPhase.description}",
-                        fontSize = 12.sp,
-                        color = TextPrimary,
-                        lineHeight = 16.sp
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(14.dp))
-
-                // Quick Log Period & Symptoms Button
-                Button(
-                    onClick = onOpenLogPeriodDialog,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(44.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = RosePrimary),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Icon(Icons.Default.AddCircleOutline, contentDescription = null, tint = Color.White, modifier = Modifier.size(18.dp))
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("Log Period / Daily Symptoms 🩸", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = Color.White)
-                }
-            }
-        }
-
-        Spacer(modifier = Modifier.height(18.dp))
-
-        // 4. GYNAECOLOGISTS & SPECIALISTS BANNER
-        GlassCard(modifier = Modifier.fillMaxWidth()) {
+        // ─────────────────────────────────────────────
+        // 6. GYNAECOLOGISTS BANNER
+        // ─────────────────────────────────────────────
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(20.dp))
+                .background(PookieCardBg)
+                .clickable { onOpenGynaecologists() }
+                .padding(16.dp)
+        ) {
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { onOpenGynaecologists() }
-                    .padding(16.dp),
+                modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
                     Box(
                         modifier = Modifier
-                            .size(46.dp)
+                            .size(44.dp)
                             .clip(CircleShape)
-                            .background(Brush.radialGradient(listOf(RosePrimary, DustyRose))),
+                            .background(Brush.radialGradient(listOf(PookiePinkPrimary, PookieLavender))),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text("👩‍⚕️", fontSize = 24.sp)
+                        Text("👩‍⚕️", fontSize = 22.sp)
                     }
                     Spacer(modifier = Modifier.width(12.dp))
                     Column {
-                        Text("Consult Gynaecologists", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
-                        Text("Online Video Calls & In-Clinic Bookings", fontSize = 11.sp, color = TextSecondary)
+                        Text("Consult Top Gynaecologists", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                        Text("Online Video Calls & Clinic Visits", fontSize = 11.sp, color = PookieTextMuted)
                     }
                 }
-                Text("Find →", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = RosePrimary)
+                Text("Book →", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = PookiePinkPrimary)
             }
         }
 
         Spacer(modifier = Modifier.height(18.dp))
 
-        // 5. PERSONALIZED CONDITION CARE (IF REPORTED)
-        if (userProfile.conditions.isNotEmpty() && !userProfile.conditions.contains("None of these")) {
-            GlassCard(modifier = Modifier.fillMaxWidth()) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.Spa, contentDescription = null, tint = RosePrimary, modifier = Modifier.size(20.dp))
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text("Personalized Care for ${userProfile.conditions.first()}", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
-                    }
-                    Spacer(modifier = Modifier.height(6.dp))
-                    Text(
-                        text = "We're tailoring nutrition, exercise intensity, and cramp relief routines specifically for your ${userProfile.conditions.joinToString(", ")} profile.",
-                        fontSize = 12.sp,
-                        color = TextSecondary,
-                        lineHeight = 16.sp
-                    )
-                }
-            }
-            Spacer(modifier = Modifier.height(18.dp))
-        }
-
-        // 6. NYRA DAILY AI INSIGHT CARD
-        GlassCard(modifier = Modifier.fillMaxWidth()) {
-            Column(modifier = Modifier.padding(18.dp)) {
+        // ─────────────────────────────────────────────
+        // 7. NYRA DAILY AI INSIGHT
+        // ─────────────────────────────────────────────
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(20.dp))
+                .background(PookieCardBg)
+                .padding(16.dp)
+        ) {
+            Column {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Box(
-                        modifier = Modifier
-                            .size(32.dp)
-                            .clip(CircleShape)
-                            .background(Brush.linearGradient(listOf(RosePrimary, DustyRose))),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(Icons.Default.AutoAwesome, contentDescription = null, tint = Color.White, modifier = Modifier.size(18.dp))
-                    }
-                    Spacer(modifier = Modifier.width(10.dp))
-                    Text("NYRA Daily Health Insight", fontWeight = FontWeight.Bold, fontSize = 15.sp, color = RosePrimary)
+                    Icon(Icons.Default.AutoAwesome, contentDescription = null, tint = PookiePinkGlow, modifier = Modifier.size(18.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("NYRA Daily Health Insight", fontWeight = FontWeight.Bold, fontSize = 14.sp, color = PookiePinkGlow)
                 }
-                Spacer(modifier = Modifier.height(10.dp))
+                Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "\"You slept ${healthSnapshot.sleepHours} hours with good HRV consistency (${healthSnapshot.hrv}ms). Your recovery score is ${healthSnapshot.recoveryScore}%. Let's keep today's workout moderate and stay hydrated!\"",
-                    fontSize = 13.sp,
-                    color = TextPrimary,
-                    lineHeight = 19.sp
+                    text = "\"You're in your ${cycleInfo.currentPhase.displayName}. Sleep was ${healthSnapshot.sleepHours}h with recovery score of ${healthSnapshot.recoveryScore}%. Stay hydrated and take things at your own pace today!\"",
+                    fontSize = 12.sp,
+                    color = Color.White.copy(alpha = 0.9f),
+                    lineHeight = 17.sp
                 )
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(10.dp))
                 Button(
                     onClick = onOpenNyraChat,
-                    colors = ButtonDefaults.buttonColors(containerColor = SoftRose),
-                    shape = RoundedCornerShape(12.dp),
-                    contentPadding = PaddingValues(horizontal = 14.dp, vertical = 6.dp)
+                    colors = ButtonDefaults.buttonColors(containerColor = PookieCardLight),
+                    shape = RoundedCornerShape(10.dp),
+                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
                 ) {
-                    Text("Chat with NYRA about your cycle →", color = RosePrimary, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+                    Text("Ask NYRA anything →", color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
                 }
             }
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
-
-        // 7. TODAY'S HEALTH OVERVIEW GRID
-        Text("Health Overview", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
-        Spacer(modifier = Modifier.height(12.dp))
-
-        Row(modifier = Modifier.fillMaxWidth()) {
-            // Heart Rate & Recovery
-            Column(modifier = Modifier.weight(1f)) {
-                MetricCard(
-                    title = "Heart Rate",
-                    value = "${healthSnapshot.heartRate} bpm",
-                    subtitle = "Resting: ${healthSnapshot.restingHeartRate} bpm",
-                    icon = Icons.Default.Favorite,
-                    accentColor = RosePrimary,
-                    onClick = onOpenHealthDetail
-                )
-                Spacer(modifier = Modifier.height(12.dp))
-                MetricCard(
-                    title = "Stress Index",
-                    value = "${healthSnapshot.edaStress}/100",
-                    subtitle = if (healthSnapshot.edaStress < 40) "Calm & Balanced" else "Elevated Stress",
-                    icon = Icons.Default.SelfImprovement,
-                    accentColor = HealthBlue,
-                    onClick = onOpenHealthDetail
-                )
-            }
-
-            Spacer(modifier = Modifier.width(12.dp))
-
-            // Sleep & Recovery
-            Column(modifier = Modifier.weight(1f)) {
-                MetricCard(
-                    title = "Recovery Score",
-                    value = "${healthSnapshot.recoveryScore}%",
-                    subtitle = "Optimal Readiness",
-                    icon = Icons.Default.BatteryChargingFull,
-                    accentColor = HealthGreen,
-                    onClick = onOpenHealthDetail
-                )
-                Spacer(modifier = Modifier.height(12.dp))
-                MetricCard(
-                    title = "Sleep Tracking",
-                    value = "${healthSnapshot.sleepHours} hrs",
-                    subtitle = "Score: ${healthSnapshot.sleepQualityScore}/100",
-                    icon = Icons.Default.Bedtime,
-                    accentColor = DustyRose,
-                    onClick = onOpenHealthDetail
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        // 8. TODAY'S REMINDERS
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text("Today's Plan", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
-            Text("${reminders.size} Scheduled", fontSize = 12.sp, color = TextMuted)
-        }
-        Spacer(modifier = Modifier.height(12.dp))
-
-        GlassCard(modifier = Modifier.fillMaxWidth()) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                reminders.forEachIndexed { idx, (title, time) ->
-                    PlanItemRow(title = title, time = time, isLast = idx == reminders.size - 1)
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun MetricCard(
-    title: String,
-    value: String,
-    subtitle: String,
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
-    accentColor: Color,
-    onClick: () -> Unit
-) {
-    GlassCard(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onClick() }
-    ) {
-        Column(modifier = Modifier.padding(14.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(title, fontSize = 13.sp, color = TextSecondary)
-                Icon(icon, contentDescription = null, tint = accentColor, modifier = Modifier.size(18.dp))
-            }
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(value, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(subtitle, fontSize = 11.sp, color = TextMuted)
-        }
-    }
-}
-
-@Composable
-fun PlanItemRow(title: String, time: String, isLast: Boolean) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Icon(Icons.Default.CheckCircleOutline, contentDescription = null, tint = RosePrimary, modifier = Modifier.size(20.dp))
-        Spacer(modifier = Modifier.width(12.dp))
-        Column(modifier = Modifier.weight(1f)) {
-            Text(title, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = TextPrimary)
-            Text(time, fontSize = 12.sp, color = TextMuted)
-        }
-    }
-    if (!isLast) {
-        HorizontalDivider(color = PeachBorder, thickness = 0.8.dp)
+        Spacer(modifier = Modifier.height(30.dp))
     }
 }
