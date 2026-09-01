@@ -37,7 +37,9 @@ fun HomeScreen(
     onOpenHealthDetail: () -> Unit,
     onOpenWatchManager: () -> Unit,
     onOpenGynaecologists: () -> Unit,
-    onOpenLogPeriodDialog: () -> Unit
+    onOpenLogPeriodDialog: () -> Unit,
+    onTriggerFakeCall: () -> Unit = {},
+    onTriggerSos: () -> Unit = {}
 ) {
     val scrollState = rememberScrollState()
     val daysUntilNext = PeriodCalculator.getDaysUntilNextPeriod(cycleInfo)
@@ -100,7 +102,82 @@ fun HomeScreen(
 
         Spacer(modifier = Modifier.height(18.dp))
 
-        // 2. LIVE MENSTRUAL CYCLE RING HERO CARD
+        // 2. WOMEN SAFETY & SAFE EXIT QUICK CARD
+        GlassCard(modifier = Modifier.fillMaxWidth()) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Box(
+                            modifier = Modifier
+                                .size(28.dp)
+                                .clip(CircleShape)
+                                .background(Color(0xFFFFECEC)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text("🛡️", fontSize = 14.sp)
+                        }
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = "Safety & Safe Exit Shield",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 14.sp,
+                            color = TextPrimary
+                        )
+                    }
+                    Text(
+                        text = "Instant ⚡",
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFFE53935)
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    // Safe Exit Fake Call Button
+                    Button(
+                        onClick = onTriggerFakeCall,
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(44.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2C3E50)),
+                        shape = RoundedCornerShape(12.dp),
+                        contentPadding = PaddingValues(horizontal = 8.dp)
+                    ) {
+                        Icon(Icons.Default.Call, contentDescription = null, tint = Color.White, modifier = Modifier.size(16.dp))
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text("Fake Call (Bhai) 📞", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                    }
+
+                    // Emergency SOS Alert Button
+                    Button(
+                        onClick = onTriggerSos,
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(44.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE53935)),
+                        shape = RoundedCornerShape(12.dp),
+                        contentPadding = PaddingValues(horizontal = 8.dp)
+                    ) {
+                        Icon(Icons.Default.Warning, contentDescription = null, tint = Color.White, modifier = Modifier.size(16.dp))
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text("SOS Location 🚨", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                    }
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(18.dp))
+
+        // 3. LIVE MENSTRUAL CYCLE RING HERO CARD
         GlassCard(modifier = Modifier.fillMaxWidth()) {
             Column(modifier = Modifier.padding(18.dp)) {
                 Row(
@@ -183,7 +260,7 @@ fun HomeScreen(
 
         Spacer(modifier = Modifier.height(18.dp))
 
-        // 3. GYNAECOLOGISTS & SPECIALISTS BANNER
+        // 4. GYNAECOLOGISTS & SPECIALISTS BANNER
         GlassCard(modifier = Modifier.fillMaxWidth()) {
             Row(
                 modifier = Modifier
@@ -215,7 +292,7 @@ fun HomeScreen(
 
         Spacer(modifier = Modifier.height(18.dp))
 
-        // 4. PERSONALIZED CONDITION CARE (IF REPORTED)
+        // 5. PERSONALIZED CONDITION CARE (IF REPORTED)
         if (userProfile.conditions.isNotEmpty() && !userProfile.conditions.contains("None of these")) {
             GlassCard(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.padding(16.dp)) {
@@ -236,7 +313,7 @@ fun HomeScreen(
             Spacer(modifier = Modifier.height(18.dp))
         }
 
-        // 5. NYRA DAILY AI INSIGHT CARD
+        // 6. NYRA DAILY AI INSIGHT CARD
         GlassCard(modifier = Modifier.fillMaxWidth()) {
             Column(modifier = Modifier.padding(18.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -273,7 +350,7 @@ fun HomeScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // 6. TODAY'S HEALTH OVERVIEW GRID
+        // 7. TODAY'S HEALTH OVERVIEW GRID
         Text("Health Overview", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
         Spacer(modifier = Modifier.height(12.dp))
 
@@ -325,7 +402,7 @@ fun HomeScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // 7. TODAY'S REMINDERS
+        // 8. TODAY'S REMINDERS
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,

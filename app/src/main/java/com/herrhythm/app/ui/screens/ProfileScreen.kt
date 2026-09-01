@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.herrhythm.app.data.HealthSensorRepository
 import com.herrhythm.app.data.MemoryItem
+import com.herrhythm.app.data.SafetySettings
 import com.herrhythm.app.data.UserProfile
 import com.herrhythm.app.ui.theme.*
 
@@ -29,17 +30,21 @@ fun ProfileScreen(
     userProfile: UserProfile,
     memories: List<MemoryItem>,
     sensorRepository: HealthSensorRepository,
+    safetySettings: SafetySettings = SafetySettings(),
+    onUpdateSafetySettings: (SafetySettings) -> Unit = {},
+    onTriggerFakeCall: () -> Unit = {},
+    onTestTelegramAlert: (SafetySettings) -> Unit = {},
     onDeleteMemory: (String) -> Unit,
     onClearMemories: () -> Unit,
     onTogglePregnancyMode: (Boolean) -> Unit
 ) {
     val scrollState = rememberScrollState()
-    var selectedSubSection by remember { mutableStateOf("Profile") } // Profile, Memories, WomenHealth, WatchDemo
+    var selectedSubSection by remember { mutableStateOf("Profile") } // Profile, Safety & SOS, Memories, WomenHealth, WatchDemo
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(DeepVioletBg)
+            .background(CreamBg)
             .verticalScroll(scrollState)
             .padding(20.dp)
     ) {
@@ -49,49 +54,50 @@ fun ProfileScreen(
                 modifier = Modifier
                     .size(64.dp)
                     .clip(CircleShape)
-                    .background(PrimaryMagenta.copy(alpha = 0.2f))
-                    .border(2.dp, PrimaryMagenta, CircleShape),
+                    .background(SoftRose)
+                    .border(2.dp, RosePrimary, CircleShape),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = userProfile.name.take(1).uppercase(),
                     fontSize = 28.sp,
                     fontWeight = FontWeight.Bold,
-                    color = PrimaryMagenta
+                    color = RosePrimary
                 )
             }
             Spacer(modifier = Modifier.width(16.dp))
             Column {
                 Text(userProfile.name, fontSize = 22.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
                 Text("${userProfile.occupation} • ${userProfile.weightKg.toInt()} kg", fontSize = 13.sp, color = TextSecondary)
-                Text("Goal: ${userProfile.fitnessGoal}", fontSize = 12.sp, color = RadiantPurple)
+                Text("Goal: ${userProfile.fitnessGoal}", fontSize = 12.sp, color = RosePrimary)
             }
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
         // Sub-navigation selector tabs
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(14.dp))
-                .background(DarkPurpleCard)
+                .background(CreamCard)
+                .border(1.dp, PeachBorder, RoundedCornerShape(14.dp))
                 .padding(4.dp)
         ) {
-            listOf("Profile", "Memories", "Women's Health", "Watch / Demo").forEach { tab ->
+            listOf("Profile", "Safety & SOS", "Memories", "Women's Health", "Watch Demo").forEach { tab ->
                 val isSelected = selectedSubSection == tab
                 Box(
                     modifier = Modifier
                         .weight(1f)
                         .clip(RoundedCornerShape(10.dp))
-                        .background(if (isSelected) PrimaryMagenta else Color.Transparent)
+                        .background(if (isSelected) RosePrimary else Color.Transparent)
                         .clickable { selectedSubSection = tab }
                         .padding(vertical = 8.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
                         text = tab,
-                        fontSize = 11.sp,
+                        fontSize = 10.sp,
                         fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
                         color = if (isSelected) Color.White else TextMuted
                     )
@@ -99,13 +105,209 @@ fun ProfileScreen(
             }
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
         when (selectedSubSection) {
             "Profile" -> ProfileTabDetails(userProfile = userProfile)
-            "Memories" -> MemoriesTabDetails(memories = memories, onDeleteMemory = onDeleteMemory, onClearAll = onClearMemories)
-            "Women's Health" -> WomensHealthTabDetails(isPregnancyMode = userProfile.isPregnancyModeEnabled, onTogglePregnancyMode = onTogglePregnancyMode)
-            "Watch / Demo" -> WatchDemoTabDetails(repository = sensorRepository)
+            "Safety & SOS" -> SafetyTabDetails(
+                settings = safetySettings,
+                onUpdateSettings = onUpdateSafetySettings,
+                onTriggerFakeCall = onTriggerFakeCall,
+                onTestTelegramAlert = onTestTelegramAlert
+            )
+            "Memories" -> MemoriesTabDetails(memories = memories, onDeleteMemory = onDeleteMemory, onClearMemories = onClearMemories)
+            "Women's Health" -> WomensHealthTabDetails(userProfile = userProfile, onTogglePregnancyMode = onTogglePregnancyMode)
+            "Watch Demo" -> WatchDemoTabDetails(repository = sensorRepository)
+        }
+    }
+}
+
+// ─────────────────────────────────────────────
+// SAFETY & SOS TAB
+// ─────────────────────────────────────────────
+@Composable
+fun SafetyTabDetails(
+    settings: SafetySettings,
+    onUpdateSettings: (SafetySettings) -> Unit,
+    onTriggerFakeCall: () -> Unit,
+    onTestTelegramAlert: (SafetySettings) -> Unit
+) {
+    var fakeCallerName by remember { mutableStateOf(settings.fakeCallerName) }
+    var fakeCallerNumber by remember { mutableStateOf(settings.fakeCallerNumber) }
+    var botToken by remember { mutableStateOf(settings.telegramBotToken) }
+    var chatId by remember { mutableStateOf(settings.telegramChatId) }
+    var emergencyContactName by remember { mutableStateOf(settings.emergencyContactName) }
+    var emergencyContactPhone by remember { mutableStateOf(settings.emergencyContactPhone) }
+    var statusMessage by remember { mutableStateOf<String?>(null) }
+
+    Column {
+        Text("Women Safety & Emergency Shield 🛡️", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
+        Text("Quick safe-exit fake calls and automatic Telegram SOS alerts with live location", fontSize = 12.sp, color = TextSecondary)
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // 1. FAKE CALL CONFIGURATION
+        GlassCard(modifier = Modifier.fillMaxWidth()) {
+            Column(modifier = Modifier.padding(18.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Default.Call, contentDescription = null, tint = RosePrimary, modifier = Modifier.size(22.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Safe Exit Fake Call Trigger", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
+                }
+                Spacer(modifier = Modifier.height(6.dp))
+                Text(
+                    "Pressing this trigger rings your phone with an incoming call screen so you can excuse yourself and leave uncomfortable situations safely.",
+                    fontSize = 12.sp,
+                    color = TextSecondary,
+                    lineHeight = 16.sp
+                )
+
+                Spacer(modifier = Modifier.height(14.dp))
+
+                OutlinedTextField(
+                    value = fakeCallerName,
+                    onValueChange = { fakeCallerName = it },
+                    label = { Text("Caller Name on Screen") },
+                    placeholder = { Text("e.g. Bada Bhai ❤️, Mom, Papa") },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(10.dp)
+                )
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                OutlinedTextField(
+                    value = fakeCallerNumber,
+                    onValueChange = { fakeCallerNumber = it },
+                    label = { Text("Caller Phone Number") },
+                    placeholder = { Text("e.g. +91 98765 43210") },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(10.dp)
+                )
+
+                Spacer(modifier = Modifier.height(14.dp))
+
+                Button(
+                    onClick = onTriggerFakeCall,
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2C3E50)),
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(10.dp)
+                ) {
+                    Icon(Icons.Default.Call, contentDescription = null, tint = Color.White, modifier = Modifier.size(16.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("⚡ Test Fake Call Now", fontSize = 13.sp, color = Color.White, fontWeight = FontWeight.Bold)
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // 2. TELEGRAM EMERGENCY SOS BROADCAST
+        GlassCard(modifier = Modifier.fillMaxWidth()) {
+            Column(modifier = Modifier.padding(18.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Default.Warning, contentDescription = null, tint = Color(0xFFE53935), modifier = Modifier.size(22.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Telegram SOS Live Location Alert", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
+                }
+                Spacer(modifier = Modifier.height(6.dp))
+                Text(
+                    "When you type \"unsafe\" / \"emergency\" in NYRA Chat or tap SOS, HerRhythm instantly fetches your GPS coordinates and broadcasts an SOS map alert to your Telegram chat/group.",
+                    fontSize = 12.sp,
+                    color = TextSecondary,
+                    lineHeight = 16.sp
+                )
+
+                Spacer(modifier = Modifier.height(14.dp))
+
+                OutlinedTextField(
+                    value = botToken,
+                    onValueChange = { botToken = it },
+                    label = { Text("Telegram Bot Token") },
+                    placeholder = { Text("e.g. 123456789:ABCdefGhIJKlmNoPQ") },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(10.dp)
+                )
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                OutlinedTextField(
+                    value = chatId,
+                    onValueChange = { chatId = it },
+                    label = { Text("Telegram Chat ID / Group ID") },
+                    placeholder = { Text("e.g. 987654321 or -100123456789") },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(10.dp)
+                )
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                OutlinedTextField(
+                    value = emergencyContactPhone,
+                    onValueChange = { emergencyContactPhone = it },
+                    label = { Text("Emergency Phone Number") },
+                    placeholder = { Text("e.g. 112 or Family Mobile") },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(10.dp)
+                )
+
+                Spacer(modifier = Modifier.height(14.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    Button(
+                        onClick = {
+                            val updated = settings.copy(
+                                fakeCallerName = fakeCallerName,
+                                fakeCallerNumber = fakeCallerNumber,
+                                telegramBotToken = botToken,
+                                telegramChatId = chatId,
+                                emergencyContactName = emergencyContactName,
+                                emergencyContactPhone = emergencyContactPhone
+                            )
+                            onUpdateSettings(updated)
+                            onTestTelegramAlert(updated)
+                            statusMessage = "Test SOS message dispatched!"
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE53935)),
+                        modifier = Modifier.weight(1f),
+                        shape = RoundedCornerShape(10.dp)
+                    ) {
+                        Text("🚀 Test SOS Alert", fontSize = 12.sp, color = Color.White, fontWeight = FontWeight.Bold)
+                    }
+
+                    Button(
+                        onClick = {
+                            val updated = settings.copy(
+                                fakeCallerName = fakeCallerName,
+                                fakeCallerNumber = fakeCallerNumber,
+                                telegramBotToken = botToken,
+                                telegramChatId = chatId,
+                                emergencyContactName = emergencyContactName,
+                                emergencyContactPhone = emergencyContactPhone
+                            )
+                            onUpdateSettings(updated)
+                            statusMessage = "Settings saved to phone memory! 💾"
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = RosePrimary),
+                        modifier = Modifier.weight(1f),
+                        shape = RoundedCornerShape(10.dp)
+                    ) {
+                        Text("Save Settings", fontSize = 12.sp, color = Color.White, fontWeight = FontWeight.Bold)
+                    }
+                }
+
+                if (statusMessage != null) {
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Text(
+                        text = statusMessage!!,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = RosePrimary
+                    )
+                }
+            }
         }
     }
 }
@@ -113,15 +315,19 @@ fun ProfileScreen(
 @Composable
 fun ProfileTabDetails(userProfile: UserProfile) {
     Column {
-        Text("Account & Personalization", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
+        Text("Personal Information", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
         Spacer(modifier = Modifier.height(12.dp))
 
         GlassCard(modifier = Modifier.fillMaxWidth()) {
             Column(modifier = Modifier.padding(16.dp)) {
+                ProfileInfoRow(label = "Full Name", value = userProfile.name)
                 ProfileInfoRow(label = "Date of Birth", value = userProfile.dateOfBirth)
-                ProfileInfoRow(label = "Language Preference", value = userProfile.preferredLanguage)
-                ProfileInfoRow(label = "AI Companion Mode", value = userProfile.aiPersonality)
-                ProfileInfoRow(label = "Primary Goal", value = userProfile.fitnessGoal)
+                ProfileInfoRow(label = "Weight", value = "${userProfile.weightKg.toInt()} kg")
+                ProfileInfoRow(label = "Occupation", value = userProfile.occupation)
+                ProfileInfoRow(label = "Work-Life Routine", value = userProfile.workLifeBalance)
+                ProfileInfoRow(label = "Relationship", value = userProfile.relationshipStatus)
+                ProfileInfoRow(label = "Health Conditions", value = if (userProfile.conditions.isEmpty()) "None" else userProfile.conditions.joinToString(", "))
+                ProfileInfoRow(label = "Cycle Length", value = "${userProfile.cycleLengthDays} days (Period: ${userProfile.periodDurationDays} days)")
             }
         }
     }
@@ -131,7 +337,7 @@ fun ProfileTabDetails(userProfile: UserProfile) {
 fun MemoriesTabDetails(
     memories: List<MemoryItem>,
     onDeleteMemory: (String) -> Unit,
-    onClearAll: () -> Unit
+    onClearMemories: () -> Unit
 ) {
     Column {
         Row(
@@ -139,49 +345,44 @@ fun MemoriesTabDetails(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("NYRA Contextual Memory Store", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
+            Text("NYRA Long-Term Memory", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
             if (memories.isNotEmpty()) {
-                TextButton(onClick = onClearAll) {
-                    Text("Clear All", fontSize = 12.sp, color = PrimaryMagenta)
+                TextButton(onClick = onClearMemories) {
+                    Text("Clear All", color = HealthRed, fontSize = 12.sp)
                 }
             }
         }
+
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            "Memories automatically extracted by NYRA to personalize wellness guidance. You have 100% control.",
+            "NYRA remembers relevant details you mention so conversations stay personal.",
             fontSize = 12.sp,
             color = TextSecondary
         )
+
         Spacer(modifier = Modifier.height(16.dp))
 
         if (memories.isEmpty()) {
             GlassCard(modifier = Modifier.fillMaxWidth()) {
                 Box(modifier = Modifier.padding(24.dp).fillMaxWidth(), contentAlignment = Alignment.Center) {
-                    Text("No stored memories right now.", fontSize = 14.sp, color = TextMuted)
+                    Text("No memories stored yet. Chat with NYRA to build memory! 🌸", fontSize = 13.sp, color = TextMuted)
                 }
             }
         } else {
             memories.forEach { memory ->
-                GlassCard(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
+                GlassCard(modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)) {
                     Row(
-                        modifier = Modifier.fillMaxWidth().padding(14.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
+                        modifier = Modifier.padding(14.dp).fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
                         Column(modifier = Modifier.weight(1f)) {
-                            Box(
-                                modifier = Modifier
-                                    .clip(RoundedCornerShape(6.dp))
-                                    .background(RadiantPurple.copy(alpha = 0.2f))
-                                    .padding(horizontal = 8.dp, vertical = 2.dp)
-                            ) {
-                                Text(memory.category, fontSize = 10.sp, fontWeight = FontWeight.Bold, color = RadiantPurple)
-                            }
-                            Spacer(modifier = Modifier.height(6.dp))
+                            Text(memory.category, fontSize = 11.sp, fontWeight = FontWeight.Bold, color = RosePrimary)
                             Text(memory.content, fontSize = 13.sp, color = TextPrimary)
+                            Text(memory.dateAdded, fontSize = 10.sp, color = TextMuted)
                         }
                         IconButton(onClick = { onDeleteMemory(memory.id) }) {
-                            Icon(Icons.Default.DeleteOutline, contentDescription = "Delete", tint = TextMuted)
+                            Icon(Icons.Default.Delete, contentDescription = "Delete", tint = TextMuted, modifier = Modifier.size(18.dp))
                         }
                     }
                 }
@@ -191,56 +392,31 @@ fun MemoriesTabDetails(
 }
 
 @Composable
-fun WomensHealthTabDetails(
-    isPregnancyMode: Boolean,
-    onTogglePregnancyMode: (Boolean) -> Unit
-) {
+fun WomensHealthTabDetails(userProfile: UserProfile, onTogglePregnancyMode: (Boolean) -> Unit) {
+    var pregnancyMode by remember { mutableStateOf(userProfile.isPregnancyModeEnabled) }
+
     Column {
-        Text("Women's Health & Cycle Tracker", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
+        Text("Women's Health Modes", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
         Spacer(modifier = Modifier.height(12.dp))
 
         GlassCard(modifier = Modifier.fillMaxWidth()) {
-            Column(modifier = Modifier.padding(18.dp)) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column {
-                        Text("Current Cycle Phase", fontSize = 13.sp, color = TextMuted)
-                        Text("Follicular Phase (Day 11)", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = PrimaryMagenta)
-                    }
-                    Box(
-                        modifier = Modifier
-                            .size(48.dp)
-                            .clip(CircleShape)
-                            .background(PrimaryMagenta.copy(alpha = 0.2f)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(Icons.Default.Spa, contentDescription = null, tint = PrimaryMagenta)
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(12.dp))
-                Text("Next predicted period: In 17 days (Est. Sep 1)", fontSize = 13.sp, color = TextSecondary)
-
-                Spacer(modifier = Modifier.height(16.dp))
-                Divider(color = GlassCardBorder, thickness = 0.8.dp)
-                Spacer(modifier = Modifier.height(14.dp))
-
+            Column(modifier = Modifier.padding(16.dp)) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Column(modifier = Modifier.weight(1f)) {
-                        Text("Pregnancy Mode", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
-                        Text("Adapts workouts, reminders & nutrition context for maternal care.", fontSize = 12.sp, color = TextMuted)
+                        Text("Pregnancy Mode 🤰", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
+                        Text("Adapts cycle predictions for gestational tracking & kick counting", fontSize = 11.sp, color = TextSecondary)
                     }
                     Switch(
-                        checked = isPregnancyMode,
-                        onCheckedChange = onTogglePregnancyMode,
-                        colors = SwitchDefaults.colors(checkedThumbColor = PrimaryMagenta, checkedTrackColor = RadiantPurple)
+                        checked = pregnancyMode,
+                        onCheckedChange = {
+                            pregnancyMode = it
+                            onTogglePregnancyMode(it)
+                        },
+                        colors = SwitchDefaults.colors(checkedThumbColor = RosePrimary, checkedTrackColor = SoftRose)
                     )
                 }
             }
@@ -253,7 +429,7 @@ fun WatchDemoTabDetails(repository: HealthSensorRepository) {
     val snapshot by repository.liveSnapshot.collectAsState()
 
     Column {
-        Text("Smartwatch Status & Hackathon Demo Controls", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
+        Text("Smartwatch Status & Sensor Simulator", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
         Spacer(modifier = Modifier.height(12.dp))
 
         GlassCard(modifier = Modifier.fillMaxWidth()) {
@@ -267,17 +443,17 @@ fun WatchDemoTabDetails(repository: HealthSensorRepository) {
                         Text("HerRhythm Companion Watch", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
                         Text(if (snapshot.isWatchConnected) "Connected via BLE (Simulated)" else "Disconnected", fontSize = 12.sp, color = if (snapshot.isWatchConnected) HealthGreen else HealthOrange)
                     }
-                    Text("Battery: 88%", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = PrimaryMagenta)
+                    Text("Battery: 88%", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = RosePrimary)
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
-                Text("Simulate Hardware Sensor Events (For Evaluators):", fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = TextSecondary)
+                Text("Simulate Hardware Sensor Events:", fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = TextSecondary)
                 Spacer(modifier = Modifier.height(10.dp))
 
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Button(
                         onClick = { repository.triggerSimulatedStressEvent() },
-                        colors = ButtonDefaults.buttonColors(containerColor = HealthOrange.copy(alpha = 0.3f)),
+                        colors = ButtonDefaults.buttonColors(containerColor = HealthOrange.copy(alpha = 0.8f)),
                         modifier = Modifier.weight(1f)
                     ) {
                         Text("Stress Spike", fontSize = 11.sp, color = Color.White)
@@ -285,7 +461,7 @@ fun WatchDemoTabDetails(repository: HealthSensorRepository) {
 
                     Button(
                         onClick = { repository.triggerSimulatedWorkoutMode() },
-                        colors = ButtonDefaults.buttonColors(containerColor = PrimaryMagenta.copy(alpha = 0.3f)),
+                        colors = ButtonDefaults.buttonColors(containerColor = RosePrimary),
                         modifier = Modifier.weight(1f)
                     ) {
                         Text("Workout Mode", fontSize = 11.sp, color = Color.White)
@@ -293,25 +469,11 @@ fun WatchDemoTabDetails(repository: HealthSensorRepository) {
 
                     Button(
                         onClick = { repository.triggerSimulatedRestState() },
-                        colors = ButtonDefaults.buttonColors(containerColor = HealthGreen.copy(alpha = 0.3f)),
+                        colors = ButtonDefaults.buttonColors(containerColor = HealthGreen),
                         modifier = Modifier.weight(1f)
                     ) {
                         Text("Rest State", fontSize = 11.sp, color = Color.White)
                     }
-                }
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                OutlinedButton(
-                    onClick = { repository.setWatchConnected(!snapshot.isWatchConnected) },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Text(
-                        text = if (snapshot.isWatchConnected) "Simulate Disconnection" else "Simulate BLE Reconnect",
-                        color = TextPrimary,
-                        fontSize = 12.sp
-                    )
                 }
             }
         }

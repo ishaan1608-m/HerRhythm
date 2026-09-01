@@ -11,7 +11,9 @@ import kotlinx.coroutines.launch
 class NyraAgentEngine(
     private val memoryRepository: UserMemoryRepository,
     private val cycleRepository: CycleRepository? = null,
-    private val healthRepository: HealthSensorRepository? = null
+    private val healthRepository: HealthSensorRepository? = null,
+    private val telegramAlertManager: TelegramAlertManager? = null,
+    private var onTriggerFakeCall: (() -> Unit)? = null
 ) {
     private val scope = CoroutineScope(Dispatchers.IO)
     private val TAG = "NyraAgentEngine"
@@ -20,9 +22,9 @@ class NyraAgentEngine(
         listOf(
             NyraMessage(
                 sender = "NYRA",
-                text = "Hey there! 🌸 I'm NYRA, your personal health companion. I'm here to chat, answer health questions, and support you throughout your cycle. How are you feeling right now?",
+                text = "Hey there! 🌸 I'm NYRA, your personal health & safety companion. I'm here to chat, answer cycle questions, support your workouts, or help you exit uncomfortable situations safely. How can I help you right now?",
                 timestamp = getCurrentTime(),
-                options = listOf("Feeling great ✨", "A bit tired 😴", "I have some discomfort 🌸")
+                options = listOf("Feeling great ✨", "Log my symptoms 🩸", "📞 Safe Exit Fake Call")
             )
         )
     )
@@ -57,16 +59,35 @@ class NyraAgentEngine(
 
     // User profile — set after onboarding
     private var userProfile: UserProfile = UserProfile()
+    private var safetySettings: SafetySettings = SafetySettings()
 
     fun setUserProfile(profile: UserProfile) {
         userProfile = profile
         val updatedWelcome = NyraMessage(
             sender = "NYRA",
-            text = "Hey ${profile.name}! 🌸 I'm NYRA, your personal health companion. I know your cycle, how you're feeling, and I'm here to support you every step of the way. What's on your mind?",
+            text = "Hey ${profile.name}! 🌸 I'm NYRA, your personal health & safety companion. I know your cycle and I'm here for your health, fitness, or if you ever need a safe exit or emergency SOS. What's on your mind?",
             timestamp = getCurrentTime(),
-            options = listOf("Feeling great ✨", "A bit tired 😴", "I have some discomfort 🌸")
+            options = listOf("Feeling great ✨", "Log my symptoms 🩸", "📞 Safe Exit Fake Call")
         )
         _messages.value = listOf(updatedWelcome)
+    }
+
+    fun setSafetySettings(settings: SafetySettings) {
+        safetySettings = settings
+    }
+
+    fun setOnTriggerFakeCall(callback: () -> Unit) {
+        onTriggerFakeCall = callback
+    }
+
+    fun isEmergencyKeyword(text: String): Boolean {
+        val lower = text.lowercase()
+        val keywords = listOf(
+            "unsafe", "emergency", "help me", "danger", "followed", "following me",
+            "scared", "sos", "save me", "uncomfortable", "creep", "stalking", "call me",
+            "fake call", "urgent", "trap", "threat", "bachao", "someone is following"
+        )
+        return keywords.any { lower.contains(it) }
     }
 
     fun sendMessage(userText: String) {
@@ -75,6 +96,63 @@ class NyraAgentEngine(
         // Add user message immediately
         val userMsg = NyraMessage(sender = "USER", text = userText, timestamp = getCurrentTime())
         _messages.value = _messages.value + userMsg
+
+        // Check for Fake Call trigger requests
+        val lowerText = userText.lowercase()
+        if (lowerText.contains("fake call") || lowerText.contains("call me from") || lowerText.contains("call me now")) {
+            val responseText = "Calling you right away from ${safetySettings.fakeCallerName}! Answer to excuse yourself safely 🌸"
+            val nyraMsg = NyraMessage(
+                sender = "NYRA",
+                text = responseText,
+                timestamp = getCurrentTime(),
+                actionCard = NyraActionCard(
+                    title = "📞 Fake Call: ${safetySettings.fakeCallerName}",
+                    subtitle = "Tap to trigger incoming call simulator immediately",
+                    timeOrDuration = "Instant",
+                    actionType = ActionType.TRIGGER_FAKE_CALL
+                )
+            )
+            _messages.value = _messages.value + nyraMsg
+            onTriggerFakeCall?.invoke()
+            return
+        }
+
+        // Check for Safety / Emergency triggers
+        if (isEmergencyKeyword(userText)) {
+            val healthSnapshot = healthRepository?.liveSnapshot?.value
+
+            // Dispatch Telegram SOS broadcast with live location asynchronously
+            scope.launch {
+                telegramAlertManager?.sendSosAlert(
+                    userProfile = userProfile,
+                    safetySettings = safetySettings,
+                    reason = "User reported: \"$userText\"",
+                    healthSnapshot = healthSnapshot
+                )
+            }
+
+            val (lat, lng) = telegramAlertManager?.getCurrentLocation() ?: Pair(28.6139, 77.2090)
+            val mapsUrl = "https://maps.google.com/?q=$lat,$lng"
+
+            val emergencyResponse = "🚨 ${userProfile.name}, I am right here with you! I have immediately dispatched an Emergency SOS Alert with your live GPS location to Telegram and your emergency contact (${safetySettings.emergencyContactPhone}).\n\n📍 Live Location: $mapsUrl\n\nTap below to trigger an immediate Fake Call from ${safetySettings.fakeCallerName} so you can excuse yourself safely and move to a crowded public space."
+
+            val emergencyCard = NyraActionCard(
+                title = "📞 Safe Exit Call (${safetySettings.fakeCallerName})",
+                subtitle = "Incoming call simulator to leave uncomfortable situations safely",
+                timeOrDuration = "Tap to Ring",
+                actionType = ActionType.TRIGGER_FAKE_CALL
+            )
+
+            val emergencyMsg = NyraMessage(
+                sender = "NYRA",
+                text = emergencyResponse,
+                timestamp = getCurrentTime(),
+                actionCard = emergencyCard,
+                options = listOf("📞 Ring Phone Now", "🚨 Call Helpline 112", "I am safe now 💕")
+            )
+            _messages.value = _messages.value + emergencyMsg
+            return
+        }
 
         // Get context data
         val cycleInfo = cycleRepository?.getCycleInfo()
@@ -104,38 +182,40 @@ class NyraAgentEngine(
             try {
                 val result = OllamaRepository.chat(
                     systemPrompt = systemPrompt,
-                    conversationHistory = conversationHistory.toList(),
+                    conversationHistory = conversationHistory,
                     userMessage = userText
                 )
 
                 result.fold(
-                    onSuccess = { replyText ->
-                        // Add to conversation history for context continuity
+                    onSuccess = { reply ->
                         conversationHistory.add(OllamaRepository.ChatMessage("user", userText))
-                        conversationHistory.add(OllamaRepository.ChatMessage("assistant", replyText))
+                        conversationHistory.add(OllamaRepository.ChatMessage("assistant", reply))
 
-                        // Keep history to last 16 messages
-                        if (conversationHistory.size > 16) {
-                            repeat(2) { conversationHistory.removeAt(0) }
+                        if (conversationHistory.size > 20) {
+                            conversationHistory.subList(0, conversationHistory.size - 20).clear()
                         }
 
                         val nyraMsg = NyraMessage(
                             sender = "NYRA",
-                            text = replyText,
+                            text = reply,
                             timestamp = getCurrentTime()
                         )
                         _messages.value = _messages.value + nyraMsg
 
-                        // Auto-extract memory if message contains personal health details
-                        if (userText.length > 25 && (
-                            userText.contains("i like", ignoreCase = true) ||
-                            userText.contains("i prefer", ignoreCase = true) ||
-                            userText.contains("i usually", ignoreCase = true) ||
-                            userText.contains("i have", ignoreCase = true) ||
-                            userText.contains("pain", ignoreCase = true) ||
-                            userText.contains("cramp", ignoreCase = true)
-                        )) {
-                            memoryRepository.addMemory("User Note", userText.take(80))
+                        if (reply.length > 30) {
+                            val category = when {
+                                userText.contains("pain", ignoreCase = true) ||
+                                userText.contains("cramp", ignoreCase = true) ||
+                                userText.contains("symptom", ignoreCase = true) -> "Symptom"
+                                userText.contains("prefer", ignoreCase = true) ||
+                                userText.contains("like", ignoreCase = true) ||
+                                userText.contains("goal", ignoreCase = true) -> "Preference"
+                                else -> "Health Note"
+                            }
+                            memoryRepository.addMemory(
+                                category = category,
+                                content = "User mentioned: $userText"
+                            )
                         }
                     },
                     onFailure = { error ->
@@ -164,7 +244,7 @@ class NyraAgentEngine(
 
     private fun buildBasicSystemPrompt(): String {
         return """
-You are NYRA, a warm and empathetic personal health companion for women. 
+You are NYRA, a warm and empathetic personal health and safety companion for women. 
 You speak like a caring best friend who is also knowledgeable about women's health.
 Be concise (2-4 sentences), warm, and genuinely helpful.
 Use emojis sparingly. Don't mention being an AI or any underlying technology.
@@ -183,7 +263,7 @@ Use emojis sparingly. Don't mention being an AI or any underlying technology.
             lower.contains("workout") || lower.contains("exercise") ->
                 "I'd love to help you stay active! 💪 Check out the Fitness tab — we have Weight Loss, Yoga, and Cycle Sync routines customized for your current energy level."
             else ->
-                "I'm here for you! 🌸 Whether it's health advice, cycle tracking, or workout routines — feel free to ask me anything."
+                "I'm here for you! 🌸 Whether it's health advice, cycle tracking, workouts, or safety support — feel free to ask me anything."
         }
     }
 
@@ -199,6 +279,9 @@ Use emojis sparingly. Don't mention being an AI or any underlying technology.
                     totalDurationMin = 30,
                     targetCalories = 210
                 )
+            }
+            ActionType.TRIGGER_FAKE_CALL -> {
+                onTriggerFakeCall?.invoke()
             }
             else -> { /* Action logged */ }
         }

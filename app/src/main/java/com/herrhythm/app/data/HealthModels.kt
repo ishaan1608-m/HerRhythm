@@ -58,6 +58,8 @@ enum class ActionType {
     LOG_SYMPTOM,
     UPDATE_GOAL,
     SCHEDULE_WALK,
+    TRIGGER_FAKE_CALL,
+    SEND_SOS_ALERT,
     NONE
 }
 

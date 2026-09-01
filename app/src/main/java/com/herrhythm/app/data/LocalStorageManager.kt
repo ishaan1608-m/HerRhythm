@@ -299,4 +299,44 @@ class LocalStorageManager(context: Context) {
         }
         return list
     }
+
+    // ─────────────────────────────────────────────
+    // SAFETY & FAKE CALL SETTINGS
+    // ─────────────────────────────────────────────
+
+    fun saveSafetySettings(settings: SafetySettings) {
+        val json = JSONObject().apply {
+            put("fakeCallerName", settings.fakeCallerName)
+            put("fakeCallerNumber", settings.fakeCallerNumber)
+            put("fakeCallDelaySeconds", settings.fakeCallDelaySeconds)
+            put("emergencyContactName", settings.emergencyContactName)
+            put("emergencyContactPhone", settings.emergencyContactPhone)
+            put("telegramBotToken", settings.telegramBotToken)
+            put("telegramChatId", settings.telegramChatId)
+            put("isSosEnabled", settings.isSosEnabled)
+            put("customSosMessage", settings.customSosMessage)
+        }
+        prefs.edit().putString("key_safety_settings", json.toString()).apply()
+    }
+
+    fun getSafetySettings(): SafetySettings {
+        val jsonStr = prefs.getString("key_safety_settings", null) ?: return SafetySettings()
+        return try {
+            val json = JSONObject(jsonStr)
+            SafetySettings(
+                fakeCallerName = json.optString("fakeCallerName", "Bada Bhai ❤️"),
+                fakeCallerNumber = json.optString("fakeCallerNumber", "+91 98765 43210"),
+                fakeCallDelaySeconds = json.optInt("fakeCallDelaySeconds", 0),
+                emergencyContactName = json.optString("emergencyContactName", "Emergency Contact (Family)"),
+                emergencyContactPhone = json.optString("emergencyContactPhone", "112"),
+                telegramBotToken = json.optString("telegramBotToken", ""),
+                telegramChatId = json.optString("telegramChatId", ""),
+                isSosEnabled = json.optBoolean("isSosEnabled", true),
+                customSosMessage = json.optString("customSosMessage", "I am feeling unsafe. Please check my live location and contact me immediately.")
+            )
+        } catch (e: Exception) {
+            SafetySettings()
+        }
+    }
 }
+

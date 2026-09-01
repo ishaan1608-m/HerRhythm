@@ -1,6 +1,7 @@
 package com.herrhythm.app
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
@@ -9,11 +10,13 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.lifecycleScope
 import com.herrhythm.app.data.*
 import com.herrhythm.app.ui.screens.*
 import com.herrhythm.app.ui.theme.HerRhythmTheme
 import com.herrhythm.app.ui.theme.RosePrimary
 import com.herrhythm.app.ui.theme.TextMuted
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 
 class MainActivity : ComponentActivity() {
@@ -24,6 +27,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var cycleRepository: CycleRepository
     private lateinit var fitnessRepository: FitnessRepository
     private lateinit var doctorRepository: DoctorRepository
+    private lateinit var telegramAlertManager: TelegramAlertManager
     private lateinit var nyraEngine: NyraAgentEngine
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,6 +36,7 @@ class MainActivity : ComponentActivity() {
         storageManager = LocalStorageManager(applicationContext)
         sensorRepository = MockWatchDataProvider()
         memoryRepository = UserMemoryRepository()
+        telegramAlertManager = TelegramAlertManager(applicationContext)
         
         // Restore memories from storage if available
         storageManager.getMemories()?.let { storedMemories ->
@@ -60,13 +65,16 @@ class MainActivity : ComponentActivity() {
         nyraEngine = NyraAgentEngine(
             memoryRepository = memoryRepository,
             cycleRepository = cycleRepository,
-            healthRepository = sensorRepository
+            healthRepository = sensorRepository,
+            telegramAlertManager = telegramAlertManager
         )
 
-        // If user profile is saved, load it into engine
+        // Load profile and safety settings into engine
         storageManager.getUserProfile()?.let { profile ->
             nyraEngine.setUserProfile(profile)
         }
+        val safetySettings = storageManager.getSafetySettings()
+        nyraEngine.setSafetySettings(safetySettings)
 
         setContent {
             HerRhythmTheme {
@@ -77,6 +85,7 @@ class MainActivity : ComponentActivity() {
                     cycleRepository = cycleRepository,
                     fitnessRepository = fitnessRepository,
                     doctorRepository = doctorRepository,
+                    telegramAlertManager = telegramAlertManager,
                     nyraEngine = nyraEngine
                 )
             }
@@ -92,6 +101,7 @@ fun MainAppContainer(
     cycleRepository: CycleRepository,
     fitnessRepository: FitnessRepository,
     doctorRepository: DoctorRepository,
+    telegramAlertManager: TelegramAlertManager,
     nyraEngine: NyraAgentEngine
 ) {
     // Persistent onboarding state
@@ -111,10 +121,25 @@ fun MainAppContainer(
         )
     }
 
+    var safetySettings by remember {
+        mutableStateOf(storageManager.getSafetySettings())
+    }
+
     var selectedTab by remember { mutableStateOf("Home") }
     var activeRunningSession by remember { mutableStateOf<WorkoutSession?>(null) }
     var showLogPeriodDialog by remember { mutableStateOf(false) }
     var showGynaecologistScreen by remember { mutableStateOf(false) }
+    var showFakeCallScreen by remember { mutableStateOf(false) }
+
+    val coroutineScope = rememberCoroutineScope()
+    val context = androidx.compose.ui.platform.LocalContext.current
+
+    // Wire up Fake Call callback in NYRA Engine
+    LaunchedEffect(Unit) {
+        nyraEngine.setOnTriggerFakeCall {
+            showFakeCallScreen = true
+        }
+    }
 
     val liveSnapshot by sensorRepository.liveSnapshot.collectAsState()
     val memories by memoryRepository.memories.collectAsState()
@@ -122,7 +147,45 @@ fun MainAppContainer(
     val isNyraLoading by nyraEngine.isLoading.collectAsState()
     val activeReminders by nyraEngine.activeReminders.collectAsState()
 
-    // Period log dialog overlay
+    // 1. Full Screen Fake Call Screen Overlay
+    if (showFakeCallScreen) {
+        FakeCallScreen(
+            callerName = safetySettings.fakeCallerName,
+            callerNumber = safetySettings.fakeCallerNumber,
+            onDismiss = { showFakeCallScreen = false }
+        )
+        return
+    }
+
+    // 2. Full screen Gynaecologist Directory overlay
+    if (showGynaecologistScreen) {
+        GynaecologistScreen(
+            doctorRepository = doctorRepository,
+            onBack = { showGynaecologistScreen = false }
+        )
+        return
+    }
+
+    // 3. Full screen interactive workout session overlay
+    if (activeRunningSession != null) {
+        val session = activeRunningSession!!
+        WorkoutSessionScreen(
+            session = session,
+            onClose = { activeRunningSession = null },
+            onSessionCompleted = { _ ->
+                fitnessRepository.markSessionComplete(
+                    programId = "weight_loss",
+                    sessionId = session.id,
+                    caloriesBurned = session.estimatedCalories
+                )
+                nyraEngine.sendMessage("I completed the ${session.title} session! Burned ${session.estimatedCalories} kcal.")
+                activeRunningSession = null
+            }
+        )
+        return
+    }
+
+    // 4. Period log dialog overlay
     if (showLogPeriodDialog) {
         LogPeriodDialog(
             initialDate = LocalDate.now(),
@@ -150,34 +213,6 @@ fun MainAppContainer(
                 showLogPeriodDialog = false
             }
         )
-    }
-
-    // Full screen Gynaecologist Directory overlay
-    if (showGynaecologistScreen) {
-        GynaecologistScreen(
-            doctorRepository = doctorRepository,
-            onBack = { showGynaecologistScreen = false }
-        )
-        return
-    }
-
-    // Full screen interactive workout session overlay
-    if (activeRunningSession != null) {
-        val session = activeRunningSession!!
-        WorkoutSessionScreen(
-            session = session,
-            onClose = { activeRunningSession = null },
-            onSessionCompleted = { _ ->
-                fitnessRepository.markSessionComplete(
-                    programId = "weight_loss",
-                    sessionId = session.id,
-                    caloriesBurned = session.estimatedCalories
-                )
-                nyraEngine.sendMessage("I completed the ${session.title} session! Burned ${session.estimatedCalories} kcal.")
-                activeRunningSession = null
-            }
-        )
-        return
     }
 
     // Onboarding flow (only shown once, saved to phone memory)
@@ -265,7 +300,21 @@ fun MainAppContainer(
                         onOpenHealthDetail = { selectedTab = "Health" },
                         onOpenWatchManager = { selectedTab = "Profile" },
                         onOpenGynaecologists = { showGynaecologistScreen = true },
-                        onOpenLogPeriodDialog = { showLogPeriodDialog = true }
+                        onOpenLogPeriodDialog = { showLogPeriodDialog = true },
+                        onTriggerFakeCall = {
+                            showFakeCallScreen = true
+                        },
+                        onTriggerSos = {
+                            coroutineScope.launch {
+                                val result = telegramAlertManager.sendSosAlert(
+                                    userProfile = userProfile,
+                                    safetySettings = safetySettings,
+                                    reason = "One-Touch Emergency SOS from Home Screen",
+                                    healthSnapshot = liveSnapshot
+                                )
+                                Toast.makeText(context, result.responseMessage, Toast.LENGTH_LONG).show()
+                            }
+                        }
                     )
                     "Health" -> HealthScreen(
                         snapshot = liveSnapshot
@@ -291,6 +340,26 @@ fun MainAppContainer(
                         userProfile = userProfile,
                         memories = memories,
                         sensorRepository = sensorRepository,
+                        safetySettings = safetySettings,
+                        onUpdateSafetySettings = { updated ->
+                            safetySettings = updated
+                            storageManager.saveSafetySettings(updated)
+                            nyraEngine.setSafetySettings(updated)
+                        },
+                        onTriggerFakeCall = {
+                            showFakeCallScreen = true
+                        },
+                        onTestTelegramAlert = { updatedSettings ->
+                            coroutineScope.launch {
+                                val res = telegramAlertManager.sendSosAlert(
+                                    userProfile = userProfile,
+                                    safetySettings = updatedSettings,
+                                    reason = "Test Emergency SOS verification alert from Settings",
+                                    healthSnapshot = liveSnapshot
+                                )
+                                Toast.makeText(context, res.responseMessage, Toast.LENGTH_LONG).show()
+                            }
+                        },
                         onDeleteMemory = { id -> memoryRepository.removeMemory(id) },
                         onClearMemories = { memoryRepository.clearAllMemories() },
                         onTogglePregnancyMode = { enabled ->
