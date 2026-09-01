@@ -47,7 +47,8 @@ fun AnalysisScreen(
     if (showWeightDialog) {
         AlertDialog(
             onDismissRequest = { showWeightDialog = false },
-            title = { Text("Update Weight ⚖️", fontWeight = FontWeight.Bold) },
+            containerColor = PookieCardBg,
+            title = { Text("Update Weight ⚖️", fontWeight = FontWeight.Bold, color = Color.White) },
             text = {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -55,7 +56,7 @@ fun AnalysisScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     IconButton(onClick = { currentWeight = (currentWeight - 0.5f).coerceAtLeast(30f) }) {
-                        Text("-", fontSize = 24.sp, fontWeight = FontWeight.Bold)
+                        Text("-", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Color.White)
                     }
                     Text(
                         text = "${String.format("%.1f", currentWeight)} kg",
@@ -65,7 +66,7 @@ fun AnalysisScreen(
                         modifier = Modifier.padding(horizontal = 16.dp)
                     )
                     IconButton(onClick = { currentWeight = (currentWeight + 0.5f).coerceAtMost(150f) }) {
-                        Text("+", fontSize = 24.sp, fontWeight = FontWeight.Bold)
+                        Text("+", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Color.White)
                     }
                 }
             },
@@ -81,7 +82,7 @@ fun AnalysisScreen(
                 }
             },
             dismissButton = {
-                TextButton(onClick = { showWeightDialog = false }) { Text("Cancel") }
+                TextButton(onClick = { showWeightDialog = false }) { Text("Cancel", color = PookieTextMuted) }
             }
         )
     }
@@ -90,7 +91,8 @@ fun AnalysisScreen(
     if (showTempDialog) {
         AlertDialog(
             onDismissRequest = { showTempDialog = false },
-            title = { Text("Log Basal Body Temperature 🌡️", fontWeight = FontWeight.Bold) },
+            containerColor = PookieCardBg,
+            title = { Text("Log Basal Body Temperature 🌡️", fontWeight = FontWeight.Bold, color = Color.White) },
             text = {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -98,7 +100,7 @@ fun AnalysisScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     IconButton(onClick = { currentTemp = (currentTemp - 0.1f).coerceAtLeast(35.0f) }) {
-                        Text("-", fontSize = 24.sp, fontWeight = FontWeight.Bold)
+                        Text("-", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Color.White)
                     }
                     Text(
                         text = "${String.format("%.1f", currentTemp)} °C",
@@ -108,7 +110,7 @@ fun AnalysisScreen(
                         modifier = Modifier.padding(horizontal = 16.dp)
                     )
                     IconButton(onClick = { currentTemp = (currentTemp + 0.1f).coerceAtMost(42.0f) }) {
-                        Text("+", fontSize = 24.sp, fontWeight = FontWeight.Bold)
+                        Text("+", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Color.White)
                     }
                 }
             },
@@ -121,7 +123,7 @@ fun AnalysisScreen(
                 }
             },
             dismissButton = {
-                TextButton(onClick = { showTempDialog = false }) { Text("Cancel") }
+                TextButton(onClick = { showTempDialog = false }) { Text("Cancel", color = PookieTextMuted) }
             }
         )
     }

@@ -4,7 +4,7 @@ import androidx.compose.ui.graphics.Color
 
 // === HERRHYTHM POOKIE CAT & PASTEL PALETTE ===
 
-// Primary Dark Theme from Reference
+// Primary Dark Theme from Reference Screenshots
 val PookieDarkBg = Color(0xFF15132B)
 val PookieCardBg = Color(0xFF221F3E)
 val PookieCardLight = Color(0xFF2C2850)
@@ -26,29 +26,29 @@ val PookieYellowText = Color(0xFFB87A1E)
 val PookiePastelPeach = Color(0xFFFFEEF3)
 val PookiePeachText = Color(0xFFD6336C)
 
-// Cream & Pastel Light Alternates
-val CreamBg = Color(0xFFFBF8F5)
-val CreamCard = Color(0xFFFFFFFF)
-val WarmSurface = Color(0xFFF3ECE4)
-val CardSurface = Color(0xFFF9F3ED)
-val DarkSurface = Color(0xFF221F3E)
-val PeachBorder = Color(0xFFE6D7CB)
+// Theme Mappings (All mapped to dark background to prevent white-on-white bugs)
+val CreamBg = PookieDarkBg
+val CreamCard = PookieCardBg
+val WarmSurface = PookieCardLight
+val CardSurface = PookieCardLight
+val DarkSurface = PookieCardLight
+val PeachBorder = Color(0xFF3B3666)
+val GlassCardBorder = Color(0xFF3B3666)
 
 // Primary Rose
 val RosePrimary = Color(0xFFFF3E85)
 val DustyRose = Color(0xFFFF659E)
 val LightRoseGlow = Color(0xFFFFABC4)
-val SoftRose = Color(0xFFFFEBF2)
+val SoftRose = Color(0xFF382F56)
 
-// Legacy aliases (keep so existing screens work)
+// Legacy Aliases
 val DeepVioletBg = PookieDarkBg
 val DarkPurpleCard = PookieCardBg
-val GlassCardBorder = Color(0xFF332F5A)
 val PrimaryMagenta = PookiePinkPrimary
 val RadiantPurple = PookieLavender
 val LightPinkGlow = PookiePinkGlow
 
-// Text
+// Text Colors (High Contrast)
 val TextPrimary = Color(0xFFFFFFFF)
 val TextSecondary = Color(0xFFA5A0CB)
 val TextMuted = Color(0xFF7E78A8)
@@ -57,7 +57,7 @@ val PookieTextDark = Color(0xFF231E48)
 val DarkTextPrimary = Color(0xFF231E48)
 val DarkTextSecondary = Color(0xFF5F578C)
 
-// Functional
+// Functional Colors
 val HealthGreen = Color(0xFF4EE4A0)
 val HealthOrange = Color(0xFFFF9F43)
 val HealthBlue = Color(0xFF48CAE4)

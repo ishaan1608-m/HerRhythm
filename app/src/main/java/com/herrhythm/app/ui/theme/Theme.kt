@@ -1,8 +1,8 @@
-﻿package com.herrhythm.app.ui.theme
+package com.herrhythm.app.ui.theme
 
 import android.app.Activity
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.lightColorScheme
+import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.Color
@@ -10,33 +10,33 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
-private val LightColorScheme = lightColorScheme(
-    primary = RosePrimary,
-    secondary = DustyRose,
-    tertiary = LightRoseGlow,
-    background = CreamBg,
-    surface = CreamCard,
+private val PookieColorScheme = darkColorScheme(
+    primary = PookiePinkPrimary,
+    secondary = PookieLavender,
+    tertiary = PookiePinkGlow,
+    background = PookieDarkBg,
+    surface = PookieCardBg,
     onPrimary = Color(0xFFFFFFFF),
     onSecondary = Color(0xFFFFFFFF),
-    onBackground = TextPrimary,
-    onSurface = TextPrimary,
-    surfaceVariant = CardSurface,
-    onSurfaceVariant = TextSecondary,
+    onBackground = Color(0xFFFFFFFF),
+    onSurface = Color(0xFFFFFFFF),
+    surfaceVariant = PookieCardLight,
+    onSurfaceVariant = PookieTextMuted,
     outline = PeachBorder
 )
 
 @Composable
 fun HerRhythmTheme(
-    darkTheme: Boolean = false,
+    darkTheme: Boolean = true,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = LightColorScheme
+    val colorScheme = PookieColorScheme
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
             window.statusBarColor = colorScheme.background.toArgb()
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = true
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = false
         }
     }
 

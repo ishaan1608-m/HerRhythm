@@ -7,10 +7,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -71,7 +67,7 @@ fun LogPeriodDialog(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.5f))
+                .background(Color.Black.copy(alpha = 0.7f))
                 .padding(16.dp),
             contentAlignment = Alignment.Center
         ) {
@@ -80,8 +76,8 @@ fun LogPeriodDialog(
                     .fillMaxWidth()
                     .fillMaxHeight(0.92f)
                     .clip(RoundedCornerShape(24.dp))
-                    .background(CreamCard)
-                    .border(1.dp, PeachBorder, RoundedCornerShape(24.dp))
+                    .background(PookieCardBg)
+                    .border(1.dp, PookieCardLight, RoundedCornerShape(24.dp))
                     .padding(20.dp)
             ) {
                 Column(
@@ -101,12 +97,12 @@ fun LogPeriodDialog(
                                 Text("🩸", fontSize = 24.sp)
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Column {
-                                    Text("Log Period & Symptoms", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
-                                    Text("Keep your cycle tracking accurate 💕", fontSize = 12.sp, color = TextSecondary)
+                                    Text("Log Period & Symptoms", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                                    Text("Keep your cycle tracking accurate 💕", fontSize = 12.sp, color = PookieTextMuted)
                                 }
                             }
                             IconButton(onClick = onDismiss) {
-                                Icon(Icons.Default.Close, contentDescription = "Close", tint = TextPrimary)
+                                Icon(Icons.Default.Close, contentDescription = "Close", tint = Color.White)
                             }
                         }
 
@@ -117,8 +113,7 @@ fun LogPeriodDialog(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clip(RoundedCornerShape(14.dp))
-                                .background(CardSurface)
-                                .border(1.dp, PeachBorder, RoundedCornerShape(14.dp))
+                                .background(PookieCardLight)
                                 .clickable { datePickerDialog.show() }
                                 .padding(14.dp)
                         ) {
@@ -128,14 +123,14 @@ fun LogPeriodDialog(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(Icons.Default.CalendarMonth, contentDescription = null, tint = RosePrimary, modifier = Modifier.size(20.dp))
+                                    Icon(Icons.Default.CalendarMonth, contentDescription = null, tint = PookiePinkPrimary, modifier = Modifier.size(20.dp))
                                     Spacer(modifier = Modifier.width(10.dp))
                                     Column {
-                                        Text("Log Date", fontSize = 11.sp, color = TextMuted)
-                                        Text("${selectedDate.dayOfMonth} ${selectedDate.month.name.take(3).lowercase().replaceFirstChar { it.uppercase() }} ${selectedDate.year}", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
+                                        Text("Log Date", fontSize = 11.sp, color = PookieTextMuted)
+                                        Text("${selectedDate.dayOfMonth} ${selectedDate.month.name.take(3).lowercase().replaceFirstChar { it.uppercase() }} ${selectedDate.year}", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Color.White)
                                     }
                                 }
-                                Text("Change 📅", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = RosePrimary)
+                                Text("Change 📅", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = PookiePinkPrimary)
                             }
                         }
 
@@ -146,7 +141,7 @@ fun LogPeriodDialog(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clip(RoundedCornerShape(12.dp))
-                                .background(if (isPeriodStartDate) SoftRose else CardSurface)
+                                .background(if (isPeriodStartDate) PookiePinkPrimary.copy(alpha = 0.2f) else PookieCardLight)
                                 .clickable { isPeriodStartDate = !isPeriodStartDate }
                                 .padding(horizontal = 12.dp, vertical = 10.dp),
                             verticalAlignment = Alignment.CenterVertically
@@ -154,16 +149,16 @@ fun LogPeriodDialog(
                             Checkbox(
                                 checked = isPeriodStartDate,
                                 onCheckedChange = { isPeriodStartDate = it },
-                                colors = CheckboxDefaults.colors(checkedColor = RosePrimary)
+                                colors = CheckboxDefaults.colors(checkedColor = PookiePinkPrimary, uncheckedColor = PookieTextMuted)
                             )
                             Spacer(modifier = Modifier.width(6.dp))
-                            Text("Mark as Period Start Date (Updates Cycle Day 1)", fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = TextPrimary)
+                            Text("Mark as Period Start Date (Updates Cycle Day 1)", fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = Color.White)
                         }
 
                         Spacer(modifier = Modifier.height(16.dp))
 
                         // 2. FLOW LEVEL
-                        Text("Flow Intensity 🩸", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
+                        Text("Flow Intensity 🩸", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Color.White)
                         Spacer(modifier = Modifier.height(8.dp))
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -176,15 +171,15 @@ fun LogPeriodDialog(
                                         .weight(1f)
                                         .height(50.dp)
                                         .clip(RoundedCornerShape(12.dp))
-                                        .background(if (isSelected) RosePrimary else CardSurface)
-                                        .border(1.dp, if (isSelected) RosePrimary else PeachBorder, RoundedCornerShape(12.dp))
+                                        .background(if (isSelected) PookiePinkPrimary else PookieCardLight)
+                                        .border(1.dp, if (isSelected) PookiePinkGlow else Color.Transparent, RoundedCornerShape(12.dp))
                                         .clickable { selectedFlow = if (isSelected) null else flow }
                                         .padding(4.dp),
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                         Text(flow.icon, fontSize = 12.sp)
-                                        Text(flow.label, fontSize = 10.sp, fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal, color = if (isSelected) Color.White else TextPrimary)
+                                        Text(flow.label, fontSize = 10.sp, fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal, color = Color.White)
                                     }
                                 }
                             }
@@ -193,7 +188,7 @@ fun LogPeriodDialog(
                         Spacer(modifier = Modifier.height(16.dp))
 
                         // 3. PHYSICAL SYMPTOMS
-                        Text("Symptoms Felt Today ⚡", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
+                        Text("Symptoms Felt Today ⚡", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Color.White)
                         Spacer(modifier = Modifier.height(8.dp))
                         FlowRow(
                             modifier = Modifier.fillMaxWidth(),
@@ -205,8 +200,8 @@ fun LogPeriodDialog(
                                 Box(
                                     modifier = Modifier
                                         .clip(RoundedCornerShape(12.dp))
-                                        .background(if (isSelected) SoftRose else CardSurface)
-                                        .border(1.dp, if (isSelected) RosePrimary else PeachBorder, RoundedCornerShape(12.dp))
+                                        .background(if (isSelected) PookiePinkPrimary else PookieCardLight)
+                                        .border(1.dp, if (isSelected) PookiePinkGlow else Color.Transparent, RoundedCornerShape(12.dp))
                                         .clickable {
                                             val next = selectedSymptoms.toMutableSet()
                                             if (isSelected) next.remove(symptom) else next.add(symptom)
@@ -214,15 +209,15 @@ fun LogPeriodDialog(
                                         }
                                         .padding(horizontal = 10.dp, vertical = 6.dp)
                                 ) {
-                                    Text("${symptom.emoji} ${symptom.label}", fontSize = 12.sp, fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal, color = if (isSelected) RosePrimary else TextPrimary)
+                                    Text("${symptom.emoji} ${symptom.label}", fontSize = 12.sp, fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal, color = Color.White)
                                 }
                             }
                         }
 
                         Spacer(modifier = Modifier.height(16.dp))
 
-                        // 4. MOOD
-                        Text("Mood 🎭", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
+                        // 4. MOOD & EMOTIONS
+                        Text("Mood & Feelings 💭", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Color.White)
                         Spacer(modifier = Modifier.height(8.dp))
                         FlowRow(
                             modifier = Modifier.fillMaxWidth(),
@@ -234,8 +229,8 @@ fun LogPeriodDialog(
                                 Box(
                                     modifier = Modifier
                                         .clip(RoundedCornerShape(12.dp))
-                                        .background(if (isSelected) SoftRose else CardSurface)
-                                        .border(1.dp, if (isSelected) RosePrimary else PeachBorder, RoundedCornerShape(12.dp))
+                                        .background(if (isSelected) PookieLavender else PookieCardLight)
+                                        .border(1.dp, if (isSelected) PookiePinkGlow else Color.Transparent, RoundedCornerShape(12.dp))
                                         .clickable {
                                             val next = selectedMoods.toMutableSet()
                                             if (isSelected) next.remove(mood) else next.add(mood)
@@ -243,58 +238,89 @@ fun LogPeriodDialog(
                                         }
                                         .padding(horizontal = 10.dp, vertical = 6.dp)
                                 ) {
-                                    Text("${mood.emoji} ${mood.label}", fontSize = 12.sp, fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal, color = if (isSelected) RosePrimary else TextPrimary)
+                                    Text("${mood.emoji} ${mood.label}", fontSize = 12.sp, fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal, color = Color.White)
                                 }
                             }
                         }
 
                         Spacer(modifier = Modifier.height(16.dp))
 
-                        // 5. HYDRATION & NOTES
-                        Text("Hydration & Notes 💧", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
-                        Spacer(modifier = Modifier.height(8.dp))
+                        // 5. HYDRATION & SLEEP
                         Row(
                             modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween
+                            horizontalArrangement = Arrangement.spacedBy(10.dp)
                         ) {
-                            Text("Water intake: $waterGlasses glasses", fontSize = 13.sp, color = TextPrimary)
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                IconButton(
-                                    onClick = { if (waterGlasses > 0) waterGlasses-- },
-                                    modifier = Modifier.size(32.dp).border(1.dp, PeachBorder, CircleShape)
-                                ) {
-                                    Text("-", fontSize = 18.sp, color = TextPrimary)
+                            // Water
+                            Box(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .clip(RoundedCornerShape(14.dp))
+                                    .background(PookieCardLight)
+                                    .padding(12.dp)
+                            ) {
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    Text("💧 Water", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                                    Spacer(modifier = Modifier.height(6.dp))
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        IconButton(onClick = { waterGlasses = (waterGlasses - 1).coerceAtLeast(0) }, modifier = Modifier.size(24.dp)) {
+                                            Text("-", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                                        }
+                                        Text("$waterGlasses gl", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = PookiePinkPrimary)
+                                        IconButton(onClick = { waterGlasses = (waterGlasses + 1).coerceAtMost(20) }, modifier = Modifier.size(24.dp)) {
+                                            Text("+", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                                        }
+                                    }
                                 }
-                                Spacer(modifier = Modifier.width(8.dp))
-                                IconButton(
-                                    onClick = { waterGlasses++ },
-                                    modifier = Modifier.size(32.dp).border(1.dp, PeachBorder, CircleShape)
-                                ) {
-                                    Text("+", fontSize = 18.sp, color = TextPrimary)
+                            }
+
+                            // Sleep
+                            Box(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .clip(RoundedCornerShape(14.dp))
+                                    .background(PookieCardLight)
+                                    .padding(12.dp)
+                            ) {
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    Text("🌙 Sleep", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                                    Spacer(modifier = Modifier.height(6.dp))
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        IconButton(onClick = { sleepHours = (sleepHours - 0.5f).coerceAtLeast(0f) }, modifier = Modifier.size(24.dp)) {
+                                            Text("-", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                                        }
+                                        Text("${String.format("%.1f", sleepHours)}h", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = PookieLavender)
+                                        IconButton(onClick = { sleepHours = (sleepHours + 0.5f).coerceAtMost(24f) }, modifier = Modifier.size(24.dp)) {
+                                            Text("+", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                                        }
+                                    }
                                 }
                             }
                         }
 
-                        Spacer(modifier = Modifier.height(10.dp))
+                        Spacer(modifier = Modifier.height(16.dp))
 
+                        // 6. NOTES
+                        Text("Personal Notes ✍️", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                        Spacer(modifier = Modifier.height(6.dp))
                         OutlinedTextField(
                             value = notesText,
                             onValueChange = { notesText = it },
-                            placeholder = { Text("Add any personal notes, cravings, or observations...", fontSize = 12.sp, color = TextMuted) },
+                            placeholder = { Text("How are you feeling? Add any specific details...", fontSize = 12.sp, color = PookieTextMuted) },
                             modifier = Modifier.fillMaxWidth(),
-                            maxLines = 2,
+                            maxLines = 3,
                             shape = RoundedCornerShape(12.dp),
                             colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = RosePrimary,
-                                unfocusedBorderColor = PeachBorder,
-                                focusedContainerColor = CreamBg,
-                                unfocusedContainerColor = CreamBg
+                                focusedTextColor = Color.White,
+                                unfocusedTextColor = Color.White,
+                                focusedContainerColor = PookieCardLight,
+                                unfocusedContainerColor = PookieCardLight,
+                                focusedBorderColor = PookiePinkPrimary,
+                                unfocusedBorderColor = Color.Transparent
                             )
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(18.dp))
+                    Spacer(modifier = Modifier.height(20.dp))
 
                     // SAVE BUTTON
                     Button(
@@ -313,10 +339,10 @@ fun LogPeriodDialog(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(50.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = RosePrimary),
+                        colors = ButtonDefaults.buttonColors(containerColor = PookiePinkPrimary),
                         shape = RoundedCornerShape(14.dp)
                     ) {
-                        Text("Save & Sync Cycle ✨", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                        Text("Save Daily Log ✨", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = Color.White)
                     }
                 }
             }
