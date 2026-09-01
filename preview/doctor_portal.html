@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en" data-stitch-project="11146883914433952783">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HerRhythm Doctor Portal - Live Consultation Console</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Google+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background: #0A0612; }
+        .doc-portal-frame {
+            max-width: 1000px;
+            margin: 20px auto;
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.6);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 88vh;
+        }
+        .portal-header {
+            background: #1A102B;
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .portal-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .portal-body {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            flex: 1;
+        }
+        .sidebar-patients {
+            border-right: 1px solid var(--border-color);
+            padding: 16px;
+            background: #130B22;
+        }
+        .patient-item {
+            padding: 12px;
+            border-radius: 14px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .patient-item:hover, .patient-item.active {
+            border-color: #FF4B82;
+            background: rgba(255, 75, 130, 0.1);
+        }
+        .doc-chat-console {
+            display: flex;
+            flex-direction: column;
+            background: #10091D;
+        }
+        .console-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+            background: #160D27;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .console-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            max-height: 520px;
+        }
+        .console-footer {
+            padding: 14px 20px;
+            border-top: 1px solid var(--border-color);
+            background: #160D27;
+            display: flex;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- DOCTOR LOGIN MODAL -->
+    <div class="modal-overlay active" id="doc-login-modal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>🩺 Doctor Portal Authentication</h3>
+            </div>
+            <div class="modal-body">
+                <p style="font-size:12px; color:var(--text-muted); margin-bottom:14px;">Enter your verified medical credentials to access HerRhythm Patient Live Consultations</p>
+                <div class="form-group">
+                    <label>Doctor Full Name</label>
+                    <input type="text" id="portal-doc-name" class="input-field" value="Dr. Ananya Sharma">
+                </div>
+                <div class="form-group">
+                    <label>Medical Registration / License ID</label>
+                    <input type="text" id="portal-doc-license" class="input-field" value="MCI-2018-98421">
+                </div>
+                <div class="form-group">
+                    <label>Govt ID Card Number (Aadhaar / Passport)</label>
+                    <input type="text" id="portal-doc-id" class="input-field" value="5482 9102 3847">
+                </div>
+                <div class="form-group">
+                    <label>Specialization</label>
+                    <input type="text" id="portal-doc-spec" class="input-field" value="Senior Gynecologist & PCOS Specialist">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary full-width" id="btn-login-doctor-portal">Login & Open Consultation Portal 🩺</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN DOCTOR PORTAL FRAME -->
+    <div class="doc-portal-frame">
+        <header class="portal-header">
+            <div class="portal-brand">
+                <div class="logo-badge" style="background: rgba(160,72,248,0.2); color:#A048F8;">🩺</div>
+                <div>
+                    <h2 id="header-doc-name" style="font-size:18px; color:white;">Dr. Ananya Sharma Portal</h2>
+                    <span id="header-doc-license" style="font-size:11px; color:#A048F8;">Verified License: MCI-2018-98421</span>
+                </div>
+            </div>
+            <div style="display:flex; gap:10px; align-items:center;">
+                <span class="live-status-indicator" style="background:rgba(78,228,160,0.15); padding:6px 12px; border-radius:12px;">🟢 Connected to HerRhythm Web</span>
+                <a href="index.html" target="_blank" class="btn btn-secondary btn-sm"><i class="fa-solid fa-mobile-screen"></i> Open Patient App 🌸</a>
+            </div>
+        </header>
+
+        <div class="portal-body">
+            <!-- SIDEBAR: PATIENTS QUEUE -->
+            <div class="sidebar-patients">
+                <h4 style="font-size:13px; color:var(--text-muted); margin-bottom:12px;">ACTIVE PATIENT QUEUE (3)</h4>
+                
+                <div class="patient-item active" data-patient="Priya Sharma">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <strong style="color:white; font-size:14px;">Priya Sharma (24 yrs)</strong>
+                        <span class="doc-tag" style="background:rgba(255,75,130,0.2); color:#FF4B82;">High Priority</span>
+                    </div>
+                    <p style="font-size:11px; color:var(--text-muted); margin-top:4px;">Chief Complaint: Severe Cramps & 3-day Delay</p>
+                    <span style="font-size:10px; color:#4EE4A0; margin-top:6px; display:inline-block;">💬 Connected Live</span>
+                </div>
+
+                <div class="patient-item" data-patient="Ananya Verma">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <strong style="color:white; font-size:14px;">Ananya Verma (27 yrs)</strong>
+                        <span class="doc-tag">PCOS Follow-up</span>
+                    </div>
+                    <p style="font-size:11px; color:var(--text-muted); margin-top:4px;">Chief Complaint: Hormonal Acne & Irregular Period</p>
+                </div>
+
+                <div class="patient-item" data-patient="Sneha Kapoor">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <strong style="color:white; font-size:14px;">Sneha Kapoor (30 yrs)</strong>
+                        <span class="doc-tag" style="background:rgba(0,180,216,0.2); color:#00B4D8;">Pregnancy</span>
+                    </div>
+                    <p style="font-size:11px; color:var(--text-muted); margin-top:4px;">Chief Complaint: Week 12 Pregnancy Checkup</p>
+                </div>
+            </div>
+
+            <!-- MAIN CHAT CONSOLE -->
+            <div class="doc-chat-console">
+                <div class="console-header">
+                    <div>
+                        <h3 id="active-patient-name" style="font-size:16px; color:white;">Priya Sharma</h3>
+                        <span style="font-size:11px; color:var(--text-muted);">Cycle History: Day 11 • Follicular Phase | Symptoms: Severe Cramps</span>
+                    </div>
+                    <button class="btn btn-secondary btn-sm" id="btn-doc-issue-rx"><i class="fa-solid fa-file-prescription"></i> Issue Digital Prescription</button>
+                </div>
+
+                <div class="console-messages" id="portal-chat-messages">
+                    <div class="chat-msg doc-msg" style="align-self:flex-start;">
+                        <div class="msg-bubble">
+                            Hello Priya! I am Dr. Ananya Sharma. I received your consultation request for Severe Cramps and Period Delay. How are you feeling right now? 🌸
+                        </div>
+                        <span class="msg-time">Doctor Console System</span>
+                    </div>
+                </div>
+
+                <div class="console-footer">
+                    <input type="text" id="portal-reply-text" class="input-field" placeholder="Type doctor advice or reply to patient..." style="flex:1;">
+                    <button class="btn btn-primary" id="btn-portal-send-reply"><i class="fa-solid fa-paper-plane"></i> Send Reply to Patient</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST CONTAINER -->
+    <div class="toast" id="toast"></div>
+
+    <script src="doctor_app.js"></script>
+</body>
+</html>

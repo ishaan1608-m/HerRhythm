@@ -1,0 +1,1266 @@
+<!DOCTYPE html>
+<html lang="en" data-stitch-project="11146883914433952783">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="stitch-design-system" content="HerRhythm-Material-Rose-V2">
+    <meta name="stitch-project-id" content="11146883914433952783">
+    <meta name="stitch-api-token" content="HERRHYTHM_STITCH_DEMO_TOKEN">
+    <title>HerRhythm - Women's Health & Cycle Companion</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Google+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="mobile-frame" data-stitch-container="app-frame">
+        <!-- ONBOARDING SETUP OVERLAY -->
+        <div class="auth-overlay active" id="auth-overlay">
+            <div class="onboarding-screen" id="onboarding-screen">
+                <div class="onboarding-header">
+                    <button class="back-btn" id="btn-onboarding-back"><i class="fa-solid fa-arrow-left"></i></button>
+                    <div class="onboarding-progress">
+                        <div class="progress-bar-fill" id="onboarding-progress-fill" style="width: 16.6%;"></div>
+                    </div>
+                    <span class="step-indicator" id="step-indicator">Step 1 of 6</span>
+                </div>
+
+                <div class="onboarding-body" id="onboarding-steps-container">
+                    <!-- Step 1: Profile Info -->
+                    <div class="onboarding-step active" data-step="1">
+                        <div class="step-badge">🌸 Step 1</div>
+                        <h2>Tell us about yourself</h2>
+                        <p class="step-desc">Let's personalize your HerRhythm experience 💕</p>
+                        
+                        <div class="form-group">
+                            <label>Your Name</label>
+                            <input type="text" id="ob-name" class="input-field" placeholder="Enter your name" value="Priya">
+                        </div>
+                        <div class="form-group">
+                            <label>Date of Birth / Age</label>
+                            <input type="date" id="ob-dob" class="input-field" value="2002-05-14">
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Physical Metrics (Height, Weight, Activity) -->
+                    <div class="onboarding-step" data-step="2">
+                        <div class="step-badge">⚖️ Step 2</div>
+                        <h2>Body & Physical Metrics</h2>
+                        <p class="step-desc">Used for calculating BMI, hydration, and calorie needs 🌸</p>
+                        
+                        <div class="form-row">
+                            <div class="form-group half">
+                                <label>Weight (kg): <strong id="ob-weight-val">55 kg</strong></label>
+                                <input type="range" id="ob-weight" min="35" max="130" value="55" class="range-slider">
+                            </div>
+                            <div class="form-group half">
+                                <label>Height (cm): <strong id="ob-height-val">162 cm</strong></label>
+                                <input type="range" id="ob-height" min="130" max="200" value="162" class="range-slider">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Average Daily Sleep</label>
+                            <div class="chips-group" id="ob-sleep-chips">
+                                <span class="chip">Less than 6 hrs 😴</span>
+                                <span class="chip active">7 - 8 hrs 🌙</span>
+                                <span class="chip">9+ hrs 💤</span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Physical Activity Level</label>
+                            <div class="chips-group" id="ob-activity-chips">
+                                <span class="chip">Sedentary 🛋️</span>
+                                <span class="chip active">Light Exercise / Yoga 🧘‍♀️</span>
+                                <span class="chip">Active Gym / Sports 🏃‍♀️</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Cycle & Period Details -->
+                    <div class="onboarding-step" data-step="3">
+                        <div class="step-badge">🩸 Step 3</div>
+                        <h2>Cycle & Period Details</h2>
+                        <p class="step-desc">Help us forecast your next period and fertility window accurately</p>
+                        
+                        <div class="form-group">
+                            <label>Date of Last Period Start</label>
+                            <input type="date" id="ob-last-period" class="input-field" value="2026-08-12">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Average Cycle Length (Days): <strong id="ob-cycle-len-val">28 days</strong></label>
+                            <input type="range" id="ob-cycle-len" min="21" max="40" value="28" class="range-slider">
+                        </div>
+                        <div class="form-group">
+                            <label>Period Duration (Days): <strong id="ob-period-len-val">5 days</strong></label>
+                            <input type="range" id="ob-period-len" min="3" max="10" value="5" class="range-slider">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Typical Flow Intensity</label>
+                            <div class="chips-group" id="ob-flow-chips">
+                                <span class="chip">Spotting 💧</span>
+                                <span class="chip">Light 🩸</span>
+                                <span class="chip active">Medium 🩸🩸</span>
+                                <span class="chip">Heavy / Clots 🩸🩸🩸</span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Cycle Regularity</label>
+                            <div class="chips-group" id="ob-regularity-chips">
+                                <span class="chip active">Very Regular</span>
+                                <span class="chip">Slightly Irregular</span>
+                                <span class="chip">PCOS / Very Irregular</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 4: Comprehensive Girls' Health Concerns -->
+                    <div class="onboarding-step" data-step="4">
+                        <div class="step-badge">🩺 Step 4</div>
+                        <h2>Girls' Health Concerns Checklist</h2>
+                        <p class="step-desc">Select all symptoms or conditions you currently experience:</p>
+                        
+                        <div class="symptoms-grid" id="ob-problems-grid">
+                            <div class="symptom-card active" data-problem="PCOS / PCOD">
+                                <span class="sym-icon">🌸</span>
+                                <div>
+                                    <strong>PCOS / PCOD</strong>
+                                    <small>Hormonal imbalance, irregular periods</small>
+                                </div>
+                            </div>
+                            <div class="symptom-card active" data-problem="Severe Cramps">
+                                <span class="sym-icon">⚡</span>
+                                <div>
+                                    <strong>Severe Cramps</strong>
+                                    <small>Pelvic pain, dysmenorrhea</small>
+                                </div>
+                            </div>
+                            <div class="symptom-card" data-problem="PMS Mood Swings">
+                                <span class="sym-icon">😖</span>
+                                <div>
+                                    <strong>PMS Mood Swings</strong>
+                                    <small>Irritability, sudden sadness</small>
+                                </div>
+                            </div>
+                            <div class="symptom-card" data-problem="Irregular Periods">
+                                <span class="sym-icon">💧</span>
+                                <div>
+                                    <strong>Irregular Periods</strong>
+                                    <small>Delayed cycles or missed months</small>
+                                </div>
+                            </div>
+                            <div class="symptom-card" data-problem="Hormonal Acne">
+                                <span class="sym-icon">✨</span>
+                                <div>
+                                    <strong>Hormonal Acne</strong>
+                                    <small>Chin & jawline breakouts</small>
+                                </div>
+                            </div>
+                            <div class="symptom-card" data-problem="Bloating & Puffiness">
+                                <span class="sym-icon">🎈</span>
+                                <div>
+                                    <strong>Bloating & Water Weight</strong>
+                                    <small>Abdominal tightness</small>
+                                </div>
+                            </div>
+                            <div class="symptom-card" data-problem="Chronic Fatigue">
+                                <span class="sym-icon">😴</span>
+                                <div>
+                                    <strong>Chronic Fatigue</strong>
+                                    <small>Low energy, mid-day crashes</small>
+                                </div>
+                            </div>
+                            <div class="symptom-card" data-problem="Heavy Bleeding">
+                                <span class="sym-icon">🩸</span>
+                                <div>
+                                    <strong>Heavy Bleeding / Clots</strong>
+                                    <small>Frequent pad changes</small>
+                                </div>
+                            </div>
+                            <div class="symptom-card" data-problem="Endometriosis / Cysts">
+                                <span class="sym-icon">🩺</span>
+                                <div>
+                                    <strong>Endometriosis / Fibroids</strong>
+                                    <small>Deep pelvic pain</small>
+                                </div>
+                            </div>
+                            <div class="symptom-card" data-problem="Excess Body Hair">
+                                <span class="sym-icon">💅</span>
+                                <div>
+                                    <strong>Hirsutism / Facial Hair</strong>
+                                    <small>PCOS-related hair growth</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 5: Lifestyle, Cravings & Medications -->
+                    <div class="onboarding-step" data-step="5">
+                        <div class="step-badge">🥗 Step 5</div>
+                        <h2>Cravings & Medications</h2>
+                        <p class="step-desc">Help us recommend tailored herbal teas & nutrition tips ☕</p>
+                        
+                        <div class="form-group">
+                            <label>Period / PMS Cravings</label>
+                            <div class="chips-group" id="ob-cravings-chips">
+                                <span class="chip active">Chocolate & Sweets 🍫</span>
+                                <span class="chip">Salty Snacks 🍟</span>
+                                <span class="chip">Carbs & Pasta 🍝</span>
+                                <span class="chip">Low Appetite 🍵</span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Supplements or Medications Taken</label>
+                            <div class="chips-group" id="ob-meds-chips">
+                                <span class="chip">PCOS Supplements (Myo-Inositol) 💊</span>
+                                <span class="chip active">Pain Relievers (Meftal/Ibuprofen) 💊</span>
+                                <span class="chip">Iron / B12 Pills 💊</span>
+                                <span class="chip">Birth Control 💊</span>
+                                <span class="chip">None 🌿</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 6: Wellness Goals -->
+                    <div class="onboarding-step" data-step="6">
+                        <div class="step-badge">✨ Step 6</div>
+                        <h2>Your Primary Health Goal</h2>
+                        <p class="step-desc">What is your main focus with HerRhythm?</p>
+                        
+                        <div class="goal-options" id="ob-goals-list">
+                            <div class="goal-card active" data-goal="Track Period & Ovulation">
+                                <i class="fa-solid fa-calendar-check"></i>
+                                <div>
+                                    <h4>Track Period & Ovulation</h4>
+                                    <p>Stay prepared for every cycle phase & fertile days</p>
+                                </div>
+                            </div>
+                            <div class="goal-card" data-goal="Manage PCOS & Cramps">
+                                <i class="fa-solid fa-heart-pulse"></i>
+                                <div>
+                                    <h4>Manage PCOS & Cramp Remedies</h4>
+                                    <p>Natural herbal teas, pelvic stretches & pain relief</p>
+                                </div>
+                            </div>
+                            <div class="goal-card" data-goal="Mood & Energy Balance">
+                                <i class="fa-solid fa-sparkles"></i>
+                                <div>
+                                    <h4>Mood & Energy Alignment</h4>
+                                    <p>Synchronize work, fitness, and diet with hormones</p>
+                                </div>
+                            </div>
+                            <div class="goal-card" data-goal="Pregnancy & Conception Mode">
+                                <i class="fa-solid fa-baby"></i>
+                                <div>
+                                    <h4>Pregnancy / Trying to Conceive</h4>
+                                    <p>Peak fertility tracking & ovulation alerts</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="onboarding-footer">
+                    <button class="btn btn-primary full-width" id="btn-onboarding-next">Next Step →</button>
+                </div>
+            </div>
+        </div>
+
+        <header class="app-header">
+            <div class="logo-area">
+                <div class="logo-badge">🌸</div>
+                <div>
+                    <h1 id="header-user-greeting">HerRhythm</h1>
+                    <span class="subtitle" id="cycle-subtitle">Cycle Day 11 • Follicular Phase</span>
+                </div>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px;">
+                <button class="icon-btn" id="theme-toggle" title="Toggle Theme">
+                    <i class="fa-solid fa-moon"></i>
+                </button>
+                <button class="profile-avatar-btn" id="btn-open-user-profile" title="Edit Health Profile & Onboarding Data">
+                    <span id="header-user-initial">P</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- FLOATING LIVE DOCTOR CHAT FAB BUTTON -->
+        <button class="chat-fab-btn" id="fab-open-doctor-chat" title="Chat Live with Doctor 🩺">
+            <i class="fa-solid fa-comments"></i>
+            <span class="fab-badge">1</span>
+        </button>
+
+        <main class="app-body">
+            <!-- TAB 1: HOME -->
+            <section id="tab-home" class="tab-content active">
+                <div class="hero-cycle-card">
+                    <div class="cycle-ring-wrapper">
+                        <svg class="cycle-svg" viewBox="0 0 100 100">
+                            <circle class="ring-bg" cx="50" cy="50" r="42"></circle>
+                            <circle class="ring-progress" id="ring-progress-bar" cx="50" cy="50" r="42" stroke-dasharray="264" stroke-dashoffset="150"></circle>
+                        </svg>
+                        <div class="cycle-ring-content">
+                            <span class="ring-label">Period in</span>
+                            <h2 class="ring-days" id="days-count">17 Days</h2>
+                            <div class="fertility-pill" id="fertility-status">High Fertility Window</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- EMERGENCY SOS PANIC SAFETY BAR -->
+                <div class="card sos-home-banner" id="btn-trigger-sos">
+                    <div class="sos-icon-wrapper"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                    <div style="flex:1;">
+                        <h4 style="color:#FF4B82; font-size:14px;">🚨 EMERGENCY SOS SAFETY PANIC</h4>
+                        <p style="font-size:11px; color:var(--text-muted);">Tap for instant GPS alert to Caregiver & Police</p>
+                    </div>
+                    <button class="btn btn-primary btn-sm sos-trigger-btn">SOS 🚨</button>
+                </div>
+
+                <div class="quick-actions">
+                    <button class="btn btn-primary" id="btn-open-log">
+                        <i class="fa-solid fa-plus"></i> Log Symptoms & Mood
+                    </button>
+                </div>
+
+                <!-- HEALTH SENSORS & SMARTWATCH VITALS DASHBOARD -->
+                <div class="section-title mt-4">Smartwatch Health Sensors & Vitals ⌚</div>
+                <div class="card sensor-dashboard-card" style="padding:16px;">
+                    <div class="sensor-header-row" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                        <div style="display:flex; align-items:center; gap:6px;">
+                            <span class="live-status-indicator" style="background:#4EE4A0; width:8px; height:8px; border-radius:50%; display:inline-block;"></span>
+                            <strong style="font-size:12px; color:var(--text-primary);">Live BLE Sensors Active</strong>
+                        </div>
+                        <button class="btn btn-secondary btn-sm" id="btn-sync-sensors" style="padding:4px 8px; font-size:10px;"><i class="fa-solid fa-rotate"></i> Sync Vitals</button>
+                    </div>
+
+                    <div class="sensor-grid">
+                        <!-- Heart Rate -->
+                        <div class="sensor-box card">
+                            <div class="sensor-icon icon-magenta"><i class="fa-solid fa-heart-pulse"></i></div>
+                            <div>
+                                <span class="sensor-label">Heart Rate</span>
+                                <h3 class="sensor-val" id="sensor-hr">74 <small style="font-size:10px;">BPM</small></h3>
+                                <span class="sensor-status" style="color:#4EE4A0;">Resting • Normal</span>
+                            </div>
+                        </div>
+
+                        <!-- Basal Body Temp (BBT) -->
+                        <div class="sensor-box card">
+                            <div class="sensor-icon icon-purple"><i class="fa-solid fa-temperature-three-quarters"></i></div>
+                            <div>
+                                <span class="sensor-label">Basal Temp (BBT)</span>
+                                <h3 class="sensor-val" id="sensor-bbt">36.7°C</h3>
+                                <span class="sensor-status" style="color:#A048F8;">Follicular Phase</span>
+                            </div>
+                        </div>
+
+                        <!-- SpO2 Blood Oxygen -->
+                        <div class="sensor-box card">
+                            <div class="sensor-icon icon-blue"><i class="fa-solid fa-lungs"></i></div>
+                            <div>
+                                <span class="sensor-label">Blood Oxygen</span>
+                                <h3 class="sensor-val" id="sensor-spo2">98%</h3>
+                                <span class="sensor-status" style="color:#4EE4A0;">Optimal Oxygen</span>
+                            </div>
+                        </div>
+
+                        <!-- HRV Stress Index -->
+                        <div class="sensor-box card">
+                            <div class="sensor-icon icon-magenta"><i class="fa-solid fa-brain"></i></div>
+                            <div>
+                                <span class="sensor-label">HRV Stress</span>
+                                <h3 class="sensor-val" id="sensor-stress">32 <small style="font-size:10px;">/ 100</small></h3>
+                                <span class="sensor-status" style="color:#4EE4A0;">Low Stress</span>
+                            </div>
+                        </div>
+
+                        <!-- Cramp Pain Sensor Index -->
+                        <div class="sensor-box card">
+                            <div class="sensor-icon icon-purple"><i class="fa-solid fa-bolt"></i></div>
+                            <div>
+                                <span class="sensor-label">Cramp Pain Index</span>
+                                <h3 class="sensor-val" id="sensor-cramp">Mild</h3>
+                                <span class="sensor-status" style="color:#FF9F43;">Level 2 / 10 Pain</span>
+                            </div>
+                        </div>
+
+                        <!-- Active Steps -->
+                        <div class="sensor-box card">
+                            <div class="sensor-icon icon-blue"><i class="fa-solid fa-shoe-prints"></i></div>
+                            <div>
+                                <span class="sensor-label">Daily Steps</span>
+                                <h3 class="sensor-val" id="sensor-steps">6,420</h3>
+                                <span class="sensor-status" style="color:var(--text-muted);">320 kcal burned</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- QUICK DOCTOR & FEATURES SHORTCUT BANNERS -->
+                <div class="doctor-home-banner card" id="btn-goto-doctor">
+                    <div class="doc-action-icon icon-purple"><i class="fa-solid fa-user-doctor"></i></div>
+                    <div>
+                        <h4>Doctor Care & Live Chat 💬</h4>
+                        <p>Talk with Dr. Ananya Sharma & Gynecologists live</p>
+                    </div>
+                </div>
+
+                <div class="doctor-home-banner card" id="btn-goto-features" style="border-color: rgba(255, 75, 130, 0.4);">
+                    <div class="doc-action-icon icon-magenta"><i class="fa-solid fa-sparkles"></i></div>
+                    <div>
+                        <h4>Explore All 11 Features ✨</h4>
+                        <p>Reminders, PCOS, SOS Safety, NYRA AI & Guided Yoga</p>
+                    </div>
+                </div>
+
+                <div class="section-title">Today's Cycle Guidance</div>
+                <div class="card phase-card" id="phase-info-card">
+                    <div class="card-icon" style="background: rgba(255, 148, 184, 0.15); color: #FF6B8B;">
+                        <i class="fa-solid fa-bolt"></i>
+                    </div>
+                    <div>
+                        <h3 id="phase-name">Follicular Phase</h3>
+                        <p id="phase-desc">Estrogen levels are rising. You may feel energized, confident, and ready to tackle new goals!</p>
+                    </div>
+                </div>
+
+                <div class="card metric-card">
+                    <div class="metric-header">
+                        <div class="metric-info">
+                            <i class="fa-solid fa-droplet" style="color: #00B4D8;"></i>
+                            <span>Water Intake</span>
+                        </div>
+                        <span class="metric-val" id="water-count">4 / 8 glasses</span>
+                    </div>
+                    <div class="progress-bar-bg">
+                        <div class="progress-fill" id="water-fill" style="width: 50%;"></div>
+                    </div>
+                    <button class="btn btn-secondary btn-sm" id="btn-add-water">+ Add Glass</button>
+                </div>
+            </section>
+
+            <!-- TAB 2: CALENDAR -->
+            <section id="tab-calendar" class="tab-content">
+                <div class="calendar-header">
+                    <h2 id="calendar-month-year">August 2026</h2>
+                    <span class="tag">Avg 28 Days</span>
+                </div>
+                <div class="calendar-grid-weekdays">
+                    <span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span>
+                </div>
+                <div class="calendar-grid-days" id="calendar-days">
+                    <!-- Injected by JS -->
+                </div>
+                <div class="calendar-legend">
+                    <span class="legend-item"><span class="dot dot-period"></span> Period</span>
+                    <span class="legend-item"><span class="dot dot-ovulation"></span> Ovulation</span>
+                    <span class="legend-item"><span class="dot dot-fertile"></span> Fertile</span>
+                </div>
+
+                <div class="card mt-4">
+                    <h3><i class="fa-solid fa-sparkles" style="color: #8A4FFF;"></i> Forecast</h3>
+                    <p class="text-muted" id="next-period-forecast">Next expected period: Aug 28, 2026</p>
+                </div>
+            </section>
+
+            <!-- TAB 3: INSIGHTS -->
+            <section id="tab-insights" class="tab-content">
+                <div class="doctor-hero" style="background: linear-gradient(135deg, rgba(138, 79, 255, 0.15), rgba(255, 75, 130, 0.15)); border-color: rgba(138, 79, 255, 0.4);">
+                    <span class="step-badge" style="background: rgba(138, 79, 255, 0.2); color: #A048F8;">📊 Cycle Intelligence & Analytics</span>
+                    <h2>Hormonal Health Insights</h2>
+                    <p class="doctor-hero-desc">Personalized cycle analytics, ovulation trends & expert medical guides 🌸</p>
+                </div>
+
+                <!-- HEALTH SCORE & HORMONAL INDEX CARD -->
+                <div class="section-title mt-3">Monthly Health & Hormonal Index</div>
+                <div class="card" style="padding: 16px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                        <div>
+                            <span style="font-size:11px; color:var(--text-muted);">Overall Health Score</span>
+                            <h2 style="font-size:24px; color:#4EE4A0; font-weight:800;">88 <small style="font-size:12px; color:var(--text-muted);">/ 100</small></h2>
+                        </div>
+                        <span class="doc-tag" style="background:rgba(78,228,160,0.15); color:#4EE4A0; padding:6px 12px; font-size:11px;">Optimal Wellness</span>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:10px; margin-top:10px;">
+                        <div style="background:rgba(255,255,255,0.03); padding:10px; border-radius:12px; border:1px solid var(--border-color);">
+                            <span style="font-size:10px; color:var(--text-muted); display:block;">Estrogen Curve</span>
+                            <strong style="font-size:13px; color:#FF8FB3;">Rising 📈 (Follicular)</strong>
+                        </div>
+                        <div style="background:rgba(255,255,255,0.03); padding:10px; border-radius:12px; border:1px solid var(--border-color);">
+                            <span style="font-size:10px; color:var(--text-muted); display:block;">Progesterone Level</span>
+                            <strong style="font-size:13px; color:#A048F8;">Baseline Low 💧</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SYMPTOM PATTERN SUMMARY CARD -->
+                <div class="section-title">30-Day Symptom Patterns</div>
+                <div class="card" style="padding: 14px;">
+                    <div style="display:flex; flex-direction:column; gap:10px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; font-size:12px;">
+                            <span><i class="fa-solid fa-bolt" style="color:#FF4B82;"></i> Cramp Intensity (Avg)</span>
+                            <strong style="color:#4EE4A0;">Mild (2 / 10)</strong>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; align-items:center; font-size:12px;">
+                            <span><i class="fa-solid fa-droplet" style="color:#00B4D8;"></i> Hydration Goal Success</span>
+                            <strong style="color:#00B4D8;">82% Completed</strong>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; align-items:center; font-size:12px;">
+                            <span><i class="fa-solid fa-moon" style="color:#A048F8;"></i> Sleep Quality Avg</span>
+                            <strong style="color:#A048F8;">7h 45m / Night</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PERSONALIZED ARTICLES LIST -->
+                <div class="section-title">Personalized Women's Health Guides 📚</div>
+                <div class="articles-list" id="articles-container">
+                    <!-- Injected by JS -->
+                </div>
+            </section>
+
+            <!-- TAB 4: SETTINGS -->
+            <section id="tab-settings" class="tab-content">
+                <div class="section-title">Cycle Parameters</div>
+                <div class="card setting-card">
+                    <label>Average Cycle Length (Days): <strong id="val-cycle-len">28</strong></label>
+                    <input type="range" id="input-cycle-len" min="21" max="40" value="28">
+                </div>
+                <div class="card setting-card">
+                    <label>Period Duration (Days): <strong id="val-period-len">5</strong></label>
+                    <input type="range" id="input-period-len" min="3" max="10" value="5">
+                </div>
+                <div class="card setting-card row-between">
+                    <span>Notifications & Reminders</span>
+                    <input type="checkbox" id="toggle-notifications" checked>
+                </div>
+                <div class="card setting-card">
+                    <label>Stitch AI Project Integration</label>
+                    <div style="font-size:11px; color:var(--text-muted); margin-top:2px; margin-bottom:8px;">Linked Project: <code>11146883914433952783</code></div>
+                    <button class="btn btn-secondary btn-sm full-width" id="btn-export-stitch"><i class="fa-solid fa-wand-magic-sparkles"></i> Export Stitch UI Specs</button>
+                </div>
+            </section>
+            <section id="tab-features" class="tab-content">
+                <div class="features-hero">
+                    <span class="step-badge">🌸 HerRhythm Suite</span>
+                    <h2>Smartwatch & Mobile Features</h2>
+                    <p class="features-hero-desc">Advanced wellness tracking, cycle intelligence, and personal safety crafted for women.</p>
+                </div>
+
+                <div class="features-grid">
+                    <!-- 1. Smart Reminders -->
+                    <div class="card feature-card">
+                        <div class="feature-header">
+                            <div class="feature-icon-wrapper icon-magenta">
+                                <i class="fa-solid fa-bell"></i>
+                            </div>
+                            <div>
+                                <h3>Smart Reminders</h3>
+                                <span class="feature-tag">Personalized</span>
+                            </div>
+                        </div>
+                        <p class="feature-desc">Tailored notifications for your daily wellness, medical needs, and routine care.</p>
+                        <div class="feature-list">
+                            <div class="feature-item"><i class="fa-solid fa-check"></i> Health & Wellness Reminders</div>
+                            <div class="feature-item"><i class="fa-solid fa-check"></i> Medication & Supplement Schedules</div>
+                            <div class="feature-item"><i class="fa-solid fa-check"></i> Hydration & Water Goal Alerts</div>
+                            <div class="feature-item"><i class="fa-solid fa-check"></i> Workout & Activity Reminders</div>
+                            <div class="feature-item"><i class="fa-solid fa-check"></i> Doctor Appointment Tracking</div>
+                            <div class="feature-item"><i class="fa-solid fa-check"></i> Daily Motivational Boosts</div>
+                        </div>
+                    </div>
+
+                    <!-- 2. PCOS / PCOD Support -->
+                    <div class="card feature-card">
+                        <div class="feature-header">
+                            <div class="feature-icon-wrapper icon-purple">
+                                <i class="fa-solid fa-seedling"></i>
+                            </div>
+                            <div>
+                                <h3>PCOS / PCOD Support</h3>
+                                <span class="feature-tag">Cycle-Aware</span>
+                            </div>
+                        </div>
+                        <p class="feature-desc">Dedicated tracking and insights for hormonal imbalance management.</p>
+                        <div class="feature-list">
+                            <div class="feature-item"><i class="fa-solid fa-check"></i> Cycle-Aware Wellness Support</div>
+                            <div class="feature-item"><i class="fa-solid fa-check"></i> Symptom & Lifestyle Tracking</div>
+                            <div class="feature-item"><i class="fa-solid fa-check"></i> Personalized Metabolic Insights</div>
+                        </div>
+                    </div>
+
+                    <!-- 3. Water Intake Tracking -->
+                    <div class="card feature-card">
+                        <div class="feature-header">
+                            <div class="feature-icon-wrapper icon-blue">
+                                <i class="fa-solid fa-droplet"></i>
+                            </div>
+                            <div>
+                                <h3>Water Intake Tracking</h3>
+                                <span class="feature-tag">Hydration</span>
+                            </div>
+                        </div>
+                        <p class="feature-desc">Log daily hydration, customize goals, and receive smart reminders.</p>
+                        <div class="feature-list">
+                            <div class="feature-item"><i class="fa-solid fa-check"></i> Daily Water Intake Logging</div>
+                            <div class="feature-item"><i class="fa-solid fa-check"></i> Custom Hydration Goals</div>
+                            <div class="feature-item"><i class="fa-solid fa-check"></i> Smart Hydration Reminders</div>
+                        </div>
+                    </div>
+
+                    <!-- 4. Pregnancy Support -->
+                    <div class="card feature-card">
+                        <div class="feature-header">
+                            <div class="feature-icon-wrapper icon-rose">
+                                <i class="fa-solid fa-baby"></i>
+                            </div>
+                            <div>
+                                <h3>Pregnancy Support</h3>
+                                <span class="feature-tag">Maternal Care</span>
+                            </div>
+                        </div>
+                        <p class="feature-desc">Specialized wellness guidance and health tracking throughout your pregnancy journey.</p>
+                        <div class="feature-list">
+                            <div class="feature-item"><i class="fa-solid fa-check"></i> Pregnancy-Aware Guidance</div>
+                            <div class="feature-item"><i class="fa-solid fa-check"></i> Important Health Reminders</div>
+                            <div class="feature-item"><i class="fa-solid fa-check"></i> Trimester Wellness Tracking</div>
+                        </div>
+                    </div>
+
+                    <!-- 5. Mood, Stress & Pattern Tracking -->
+                    <div class="card feature-card">
+                        <div class="feature-header">
+                            <div class="feature-icon-wrapper icon-magenta">
+                                <i class="fa-solid fa-brain"></i>
+                            </div>
+                            <div>
+                                <h3>Mood, Stress & Pattern Tracking</h3>
+                                <span class="feature-tag">Analytics</span>
+                            </div>
+                        </div>
+                        <p class="feature-desc">Understand emotional shifts, stress triggers, and hormonal patterns.</p>
+                        <div class="feature-list">
+                            <div class="feature-item"><i class="fa-solid fa-check"></i> Daily Mood Logging</div>
+                            <div class="feature-item"><i class="fa-solid fa-check"></i> Stress Level Monitoring</div>
+                            <div class="feature-item"><i class="fa-solid fa-check"></i> Daily & Weekly Hormonal Patterns</div>
+                            <div class="feature-item"><i class="fa-solid fa-check"></i> Health & Lifestyle Insights</div>
+                        </div>
+                    </div>
+
+                    <!-- 6. NYRA AI Bot (CLEAN PLACEHOLDER ONLY) -->
+                    <div class="card feature-card placeholder-card">
+                        <div class="feature-header">
+                            <div class="feature-icon-wrapper icon-glowing">
+                                <i class="fa-solid fa-robot"></i>
+                            </div>
+                            <div>
+                                <h3>NYRA AI — Coming Soon</h3>
+                                <span class="badge-coming-soon">Coming Soon</span>
+                            </div>
+                        </div>
+                        <p class="feature-desc">Your 24/7 intelligent health & cycle assistant. This integration space is reserved for future AI releases.</p>
+                        <div class="placeholder-status-box">
+                            <i class="fa-solid fa-sparkles"></i>
+                            <span>Integration Ready • Future System Placeholder</span>
+                        </div>
+                    </div>
+
+                    <!-- 7. Emergency & Safety Features -->
+                    <div class="card feature-card sos-feature-card">
+                        <div class="feature-header">
+                            <div class="feature-icon-wrapper icon-red">
+                                <i class="fa-solid fa-shield-halved"></i>
+                            </div>
+                            <div>
+                                <h3>Emergency & Safety Features</h3>
+                                <span class="feature-tag tag-sos">SOS Ready</span>
+                            </div>
+                        </div>
+                        <p class="feature-desc">Instant emergency alerts and rapid location & medical ID access when you need it most.</p>
+                        <div class="feature-list">
+                            <div class="feature-item"><i class="fa-solid fa-check"></i> Emergency / SOS One-Tap Support</div>
+                            <div class="feature-item"><i class="fa-solid fa-check"></i> Instant Safety Broadcast Alerts</div>
+                            <div class="feature-item"><i class="fa-solid fa-check"></i> Quick Emergency Access Button</div>
+                        </div>
+                    </div>
+
+                    <!-- 8. Health Reports & Insights -->
+                    <div class="card feature-card">
+                        <div class="feature-header">
+                            <div class="feature-icon-wrapper icon-purple">
+                                <i class="fa-solid fa-chart-pie"></i>
+                            </div>
+                            <div>
+                                <h3>Health Reports & Insights</h3>
+                                <span class="feature-tag">History</span>
+                            </div>
+                        </div>
+                        <p class="feature-desc">Detailed health summaries, weekly cycle trends, and historical analysis.</p>
+                        <div class="feature-list">
+                            <div class="feature-item"><i class="fa-solid fa-check"></i> Daily Health Breakdown</div>
+                            <div class="feature-item"><i class="fa-solid fa-check"></i> Weekly Health Summaries</div>
+                            <div class="feature-item"><i class="fa-solid fa-check"></i> Monthly Cycle Insights</div>
+                            <div class="feature-item"><i class="fa-solid fa-check"></i> Personalized Health History</div>
+                        </div>
+                    </div>
+
+                    <!-- 9. Guided Sessions -->
+                    <div class="card feature-card">
+                        <div class="feature-header">
+                            <div class="feature-icon-wrapper icon-green">
+                                <i class="fa-solid fa-spa"></i>
+                            </div>
+                            <div>
+                                <h3>Guided Sessions</h3>
+                                <span class="feature-tag">Activities</span>
+                            </div>
+                        </div>
+                        <p class="feature-desc">Interactive, selectable sessions for deep breathing, pelvic yoga, and mindfulness.</p>
+                        <div class="guided-sessions-selector">
+                            <button class="guided-btn active" data-session="breathing"><i class="fa-solid fa-wind"></i> Breathing</button>
+                            <button class="guided-btn" data-session="yoga"><i class="fa-solid fa-person-dots-from-line"></i> Yoga</button>
+                            <button class="guided-btn" data-session="meditation"><i class="fa-solid fa-om"></i> Meditation</button>
+                        </div>
+                        <div class="guided-session-display" id="guided-session-info">
+                            <h4 id="guided-title">4-7-8 Deep Breathing</h4>
+                            <p id="guided-desc">Calm nervous system & reduce period stress (5 Mins)</p>
+                            <button class="btn btn-secondary btn-sm full-width mt-2" id="btn-start-session"><i class="fa-solid fa-play"></i> Start Guided Session</button>
+                        </div>
+                    </div>
+
+                    <!-- 10. Voice/Text Interface -->
+                    <div class="card feature-card">
+                        <div class="feature-header">
+                            <div class="feature-icon-wrapper icon-magenta">
+                                <i class="fa-solid fa-microphone"></i>
+                            </div>
+                            <div>
+                                <h3>Voice / Text Interface</h3>
+                                <span class="badge-ui-only">UI Preview Only</span>
+                            </div>
+                        </div>
+                        <p class="feature-desc">Hands-free voice interaction and text command UI ready for future integration.</p>
+                        <div class="voice-ui-preview">
+                            <input type="text" class="input-field voice-input-mock" placeholder="Ask or command HerRhythm..." readonly>
+                            <button class="voice-mic-btn" title="Voice Input (UI Preview)"><i class="fa-solid fa-microphone"></i></button>
+                        </div>
+                    </div>
+
+                    <!-- 11. Doctor / Caregiver Access -->
+                    <div class="card feature-card">
+                        <div class="feature-header">
+                            <div class="feature-icon-wrapper icon-blue">
+                                <i class="fa-solid fa-user-doctor"></i>
+                            </div>
+                            <div>
+                                <h3>Doctor / Caregiver Access</h3>
+                                <span class="feature-tag">Privacy Control</span>
+                            </div>
+                        </div>
+                        <p class="feature-desc">Share selected health reports with trusted doctors or caregivers with strict consent control.</p>
+                        <div class="consent-box">
+                            <label class="toggle-switch-label">
+                                <span>Doctor Access Consent</span>
+                                <input type="checkbox" id="doctor-consent-toggle" checked>
+                            </label>
+                            <small class="text-muted"><i class="fa-solid fa-lock"></i> User consent required. Revoke access anytime.</small>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB: DOCTOR & CARE CONSULTATION -->
+            <section id="tab-doctor" class="tab-content">
+                <div class="doctor-hero">
+                    <span class="step-badge">🩺 Doctor Care & Consultation</span>
+                    <h2>Women's Health Specialists</h2>
+                    <p class="doctor-hero-desc">Connect with verified Gynecologists, PCOS Experts & Fertility Specialists online 🌸</p>
+                    <a href="doctor_portal.html" target="_blank" class="btn btn-secondary btn-sm mt-2" style="display:inline-flex; align-items:center; gap:6px;"><i class="fa-solid fa-arrow-up-right-from-square"></i> Open Dedicated Doctor Web Portal (For Doctors) 🩺</a>
+                </div>
+
+                <!-- QUICK DOCTOR ACTION CARDS -->
+                <div class="doctor-quick-grid">
+                    <div class="card doc-action-card" id="btn-share-report-card">
+                        <div class="doc-action-icon icon-blue"><i class="fa-solid fa-file-medical"></i></div>
+                        <div>
+                            <h4>Share Cycle Report</h4>
+                            <p>Generate 30-day health summary for doctor</p>
+                        </div>
+                    </div>
+                    <div class="card doc-action-card" id="btn-upload-prescription-card">
+                        <div class="doc-action-icon icon-purple"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+                        <div>
+                            <h4>Prescription Vault</h4>
+                            <p>Upload & store medical records securely</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PATIENT DIRECT MESSAGE BOX FOR DOCTOR -->
+                <div class="section-title mt-4">Direct Message Your Doctor</div>
+                <div class="card patient-msg-card" style="padding:16px; margin-top:8px;">
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
+                        <div class="doc-action-icon icon-magenta"><i class="fa-solid fa-comments"></i></div>
+                        <div>
+                            <h4 style="font-size:15px; color:var(--text-primary);">Message Doctor Directly 💬</h4>
+                            <p style="font-size:11px; color:var(--text-muted);">Send health questions, period concerns & symptom updates to doctor</p>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Select Doctor:</label>
+                        <select id="direct-msg-doc-select" class="input-field" style="padding:8px 12px; font-size:13px; background:#160D27;">
+                            <option value="Dr. Ananya Sharma">👩‍⚕️ Dr. Ananya Sharma (Senior Gynecologist & PCOS Specialist)</option>
+                            <option value="Dr. Meera Iyer">👩‍⚕️ Dr. Meera Iyer (Fertility & Reproductive Endocrinologist)</option>
+                            <option value="Dr. Ritu Verma">👩‍⚕️ Dr. Ritu Verma (Holistic Women's Nutritionist & Hormones)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Type Message to Doctor:</label>
+                        <textarea id="direct-msg-text" class="input-field" rows="3" placeholder="e.g. Hello Doctor, I have severe cramps and 3 days period delay. Please advise remedies 🌸" style="resize:none; font-size:13px;"></textarea>
+                    </div>
+
+                    <button class="btn btn-primary full-width" id="btn-send-patient-direct-msg">
+                        <i class="fa-solid fa-paper-plane"></i> Send Message to Doctor 🚀
+                    </button>
+                </div>
+
+                <!-- SPECIALIST DOCTORS LIST -->
+                <div class="section-title mt-4">Top Verified Gynecologists</div>
+                <div class="doctors-list">
+                    <!-- Doctor Card 1 -->
+                    <div class="card doctor-card">
+                        <div class="doc-avatar-wrapper">
+                            <span class="doc-avatar">👩‍⚕️</span>
+                            <span class="doc-status-online"></span>
+                        </div>
+                        <div class="doc-info">
+                            <div class="doc-name-row">
+                                <h3>Dr. Ananya Sharma</h3>
+                                <span class="doc-rating"><i class="fa-solid fa-star"></i> 4.9 (120+)</span>
+                            </div>
+                            <span class="doc-spec">Senior Gynecologist & PCOS Specialist</span>
+                            <p class="doc-exp"><i class="fa-solid fa-briefcase"></i> 12+ Yrs Exp • MBBS, MD (Gynae)</p>
+                            <div class="doc-tags">
+                                <span class="doc-tag">PCOS / PCOD</span>
+                                <span class="doc-tag">Severe Cramps</span>
+                                <span class="doc-tag">Irregular Period</span>
+                            </div>
+                            <div class="doc-action-row">
+                                <span class="doc-fee">₹599 / Consult</span>
+                                <div class="doc-btn-group">
+                                    <button class="btn btn-secondary btn-sm btn-chat-doc" data-doc="Dr. Ananya Sharma"><i class="fa-solid fa-comments"></i> Chat Live</button>
+                                    <button class="btn btn-primary btn-sm btn-book-doc" data-doc="Dr. Ananya Sharma">Book 🩺</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Doctor Card 2 -->
+                    <div class="card doctor-card">
+                        <div class="doc-avatar-wrapper">
+                            <span class="doc-avatar">👩‍⚕️</span>
+                            <span class="doc-status-online"></span>
+                        </div>
+                        <div class="doc-info">
+                            <div class="doc-name-row">
+                                <h3>Dr. Meera Iyer</h3>
+                                <span class="doc-rating"><i class="fa-solid fa-star"></i> 4.8 (95+)</span>
+                            </div>
+                            <span class="doc-spec">Reproductive Endocrinologist & Fertility Expert</span>
+                            <p class="doc-exp"><i class="fa-solid fa-briefcase"></i> 15+ Yrs Exp • MD, DNB</p>
+                            <div class="doc-tags">
+                                <span class="doc-tag">Fertility Care</span>
+                                <span class="doc-tag">Endometriosis</span>
+                                <span class="doc-tag">Hormone Balance</span>
+                            </div>
+                            <div class="doc-action-row">
+                                <span class="doc-fee">₹699 / Consult</span>
+                                <div class="doc-btn-group">
+                                    <button class="btn btn-secondary btn-sm btn-chat-doc" data-doc="Dr. Meera Iyer"><i class="fa-solid fa-comments"></i> Chat Live</button>
+                                    <button class="btn btn-primary btn-sm btn-book-doc" data-doc="Dr. Meera Iyer">Book 🩺</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Doctor Card 3 -->
+                    <div class="card doctor-card">
+                        <div class="doc-avatar-wrapper">
+                            <span class="doc-avatar">👩‍⚕️</span>
+                            <span class="doc-status-online"></span>
+                        </div>
+                        <div class="doc-info">
+                            <div class="doc-name-row">
+                                <h3>Dr. Ritu Verma</h3>
+                                <span class="doc-rating"><i class="fa-solid fa-star"></i> 4.9 (210+)</span>
+                            </div>
+                            <span class="doc-spec">Holistic Women's Nutritionist & Hormonal Wellness</span>
+                            <p class="doc-exp"><i class="fa-solid fa-briefcase"></i> 8+ Yrs Exp • MSc Clinical Nutrition</p>
+                            <div class="doc-tags">
+                                <span class="doc-tag">PCOS Diet</span>
+                                <span class="doc-tag">Weight Management</span>
+                                <span class="doc-tag">Acne Remedies</span>
+                            </div>
+                            <div class="doc-action-row">
+                                <span class="doc-fee">₹499 / Consult</span>
+                                <div class="doc-btn-group">
+                                    <button class="btn btn-secondary btn-sm btn-chat-doc" data-doc="Dr. Ritu Verma"><i class="fa-solid fa-comments"></i> Chat Live</button>
+                                    <button class="btn btn-primary btn-sm btn-book-doc" data-doc="Dr. Ritu Verma">Book 🩺</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CAREGIVER & EMERGENCY CONTACT CARD -->
+                <div class="section-title mt-4">Emergency & Caregiver Contact</div>
+                <div class="card caregiver-card">
+                    <div class="caregiver-header">
+                        <div class="caregiver-icon"><i class="fa-solid fa-hand-holding-heart"></i></div>
+                        <div>
+                            <h4>Trusted Caregiver & Emergency Alert</h4>
+                            <p>Share instant emergency updates or severe cramp notifications</p>
+                        </div>
+                    </div>
+                    <div class="form-group mt-2">
+                        <label>Caregiver / Emergency Contact Name</label>
+                        <input type="text" id="caregiver-name" class="input-field" placeholder="e.g. Mom, Partner, Doctor" value="Mom 💕">
+                    </div>
+                    <div class="form-group">
+                        <label>Phone Number</label>
+                        <input type="tel" id="caregiver-phone" class="input-field" placeholder="+91 98765 43210" value="+91 98765 43210">
+                    </div>
+                    <button class="btn btn-secondary btn-sm full-width" id="btn-save-caregiver"><i class="fa-solid fa-floppy-disk"></i> Save Emergency Contact</button>
+                </div>
+            </section>
+
+            <!-- TAB: DOCTOR DASHBOARD PORTAL (WHEN LOGGED IN AS DOCTOR) -->
+            <section id="tab-doctor-portal" class="tab-content">
+                <div class="doctor-hero">
+                    <span class="step-badge">🩺 Doctor Console</span>
+                    <h2>Dr. Ananya Sharma Portal</h2>
+                    <p class="doctor-hero-desc">Live patient consultation queue, incoming chat requests & digital prescriptions 👩‍⚕️</p>
+                </div>
+
+                <div class="section-title">Incoming Live Chat & Patient Queue</div>
+                <div class="doctors-list">
+                    <!-- Patient 1 -->
+                    <div class="card doctor-card">
+                        <div class="doc-avatar-wrapper">
+                            <span class="doc-avatar">👩</span>
+                            <span class="doc-status-online"></span>
+                        </div>
+                        <div class="doc-info">
+                            <div class="doc-name-row">
+                                <h3>Priya Sharma (24 yrs)</h3>
+                                <span class="doc-tag" style="background: rgba(255,75,130,0.2); color:#FF4B82;">High Priority</span>
+                            </div>
+                            <span class="doc-spec">Chief Complaint: Severe Cramps & 3-day Period Delay</span>
+                            <p class="doc-exp"><i class="fa-solid fa-clock"></i> Live Chat Active • 2 mins ago</p>
+                            <div class="doc-action-row">
+                                <button class="btn btn-primary btn-sm btn-open-chat-modal" data-doc="Priya Sharma (Patient)"><i class="fa-solid fa-comments"></i> Open Patient Chat</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Patient 2 -->
+                    <div class="card doctor-card">
+                        <div class="doc-avatar-wrapper">
+                            <span class="doc-avatar">👩</span>
+                        </div>
+                        <div class="doc-info">
+                            <div class="doc-name-row">
+                                <h3>Ananya Verma (27 yrs)</h3>
+                                <span class="doc-tag">PCOS Follow-up</span>
+                            </div>
+                            <span class="doc-spec">Chief Complaint: Hormonal Acne & Irregular Cycles</span>
+                            <p class="doc-exp"><i class="fa-solid fa-calendar"></i> Appointment: Today, 02:30 PM</p>
+                            <div class="doc-action-row">
+                                <button class="btn btn-secondary btn-sm btn-open-chat-modal" data-doc="Ananya Verma (Patient)"><i class="fa-solid fa-file-medical"></i> Review Cycle Report</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- LIVE DOCTOR CHAT MODAL -->
+        <div class="modal-overlay" id="doc-live-chat-modal">
+            <div class="modal-card chat-modal-card">
+                <div class="modal-header chat-header">
+                    <div class="chat-doc-info">
+                        <div class="doc-avatar-small">👩‍⚕️</div>
+                        <div style="flex: 1;">
+                            <label style="font-size: 10px; color: #FF8FB3; font-weight: 700; display: block;">SELECT GYNECOLOGIST / SPECIALIST:</label>
+                            <select id="chat-doctor-selector" class="input-field" style="padding: 4px 8px; font-size: 12px; margin-top: 2px; border-color: rgba(255, 75, 130, 0.4); background: #160D27;">
+                                <option value="Dr. Ananya Sharma">👩‍⚕️ Dr. Ananya Sharma (Senior Gynecologist & PCOS Specialist)</option>
+                                <option value="Dr. Meera Iyer">👩‍⚕️ Dr. Meera Iyer (Fertility & Reproductive Endocrinologist)</option>
+                                <option value="Dr. Ritu Verma">👩‍⚕️ Dr. Ritu Verma (Holistic Nutritionist & Hormones)</option>
+                            </select>
+                            <span class="live-status-indicator" style="display:block; margin-top:3px;">🟢 Online Now • Live Instant Reply</span>
+                        </div>
+                    </div>
+                    <button class="close-btn" id="btn-close-live-chat-modal">&times;</button>
+                </div>
+                <div class="modal-body chat-body" id="chat-messages-container">
+                    <!-- Initial Welcome Message from Doctor -->
+                    <div class="chat-msg doc-msg">
+                        <div class="msg-bubble">
+                            Hello! 👋 I'm <strong id="chat-inline-doc-name">Dr. Ananya Sharma</strong>. I see your health details. How can I assist you with your cycle, PCOS, or cramps today? 🌸
+                        </div>
+                        <span class="msg-time">Just now</span>
+                    </div>
+                </div>
+
+                <!-- QUICK SYMPTOM SHORTCUT CHIPS -->
+                <div class="chat-quick-shortcuts">
+                    <span class="chat-shortcut-chip" data-msg="I am having severe cramps and lower back pain ⚡">⚡ Severe Cramps</span>
+                    <span class="chat-shortcut-chip" data-msg="My period is delayed by 3 days 💧">💧 Period Delay</span>
+                    <span class="chat-shortcut-chip" data-msg="Can you recommend a PCOS diet & tea? 🥗">🥗 PCOS Advice</span>
+                </div>
+
+                <div class="modal-footer chat-footer">
+                    <button class="chat-attach-btn" id="btn-chat-attach" title="Send Report / Image"><i class="fa-solid fa-paperclip"></i></button>
+                    <input type="text" id="chat-input-text" class="input-field chat-input" placeholder="Type message to doctor..." autocomplete="off">
+                    <button class="btn btn-primary chat-send-btn" id="btn-send-chat-msg"><i class="fa-solid fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- DOCTOR APPOINTMENT MODAL -->
+        <div class="modal-overlay" id="doc-modal">
+            <div class="modal-card">
+                <div class="modal-header">
+                    <h3 id="doc-modal-title">Book Doctor Consultation</h3>
+                    <button class="close-btn" id="btn-close-doc-modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Select Date</label>
+                        <input type="date" id="doc-book-date" class="input-field" value="2026-08-25">
+                    </div>
+                    <div class="form-group">
+                        <label>Select Time Slot</label>
+                        <div class="chips-group" id="doc-time-chips">
+                            <span class="chip active">10:00 AM</span>
+                            <span class="chip">02:30 PM</span>
+                            <span class="chip">06:00 PM</span>
+                            <span class="chip">08:00 PM</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Reason for Visit / Health Problem</label>
+                        <div class="chips-group" id="doc-reason-chips">
+                            <span class="chip active">PCOS Consultation</span>
+                            <span class="chip">Severe Cramps Relief</span>
+                            <span class="chip">Irregular Period Check</span>
+                            <span class="chip">General Wellness</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary full-width" id="btn-confirm-doc-booking">Confirm Booking 🩺</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- LOG SYMPTOMS MODAL -->
+        <div class="modal-overlay" id="log-modal">
+            <div class="modal-card">
+                <div class="modal-header">
+                    <h3>Log Daily Symptoms</h3>
+                    <button class="close-btn" id="btn-close-log">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Flow Intensity</label>
+                        <div class="chips-group" id="flow-chips">
+                            <span class="chip" data-flow="Spotting">💧 Spotting</span>
+                            <span class="chip active" data-flow="Light">🩸 Light</span>
+                            <span class="chip" data-flow="Medium">🩸🩸 Medium</span>
+                            <span class="chip" data-flow="Heavy">🩸🩸🩸 Heavy</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Mood</label>
+                        <div class="chips-group" id="mood-chips">
+                            <span class="chip active">😊 Happy</span>
+                            <span class="chip">⚡ Energetic</span>
+                            <span class="chip">😌 Calm</span>
+                            <span class="chip">😟 Anxious</span>
+                            <span class="chip">😴 Tired</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Symptoms</label>
+                        <div class="chips-group" id="symptom-chips">
+                            <span class="chip active">⚡ Cramps</span>
+                            <span class="chip">🤕 Headache</span>
+                            <span class="chip">🎈 Bloating</span>
+                            <span class="chip">✨ Acne</span>
+                            <span class="chip">🍫 Cravings</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary full-width" id="btn-save-log">Save Entry</button>
+                </div>
+            </div>
+        </div>
+
+        </main>
+
+        <!-- USER PROFILE & ONBOARDING DATA EDITOR MODAL -->
+        <div class="modal-overlay" id="user-profile-modal">
+            <div class="modal-card" style="max-height:85vh; overflow-y:auto;">
+                <div class="modal-header">
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <div class="profile-avatar-large" style="width:40px; height:40px; border-radius:50%; background:linear-gradient(135deg, #FF4B82, #A048F8); color:white; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:700;">👤</div>
+                        <div>
+                            <h3 id="modal-profile-title" style="font-size:16px;">Priya's Health Profile</h3>
+                            <span style="font-size:11px; color:var(--text-muted);">Edit Onboarding & Personal Details</span>
+                        </div>
+                    </div>
+                    <button class="close-btn" id="btn-close-profile-modal">&times;</button>
+                </div>
+                <div class="modal-body" style="padding:10px 0;">
+                    <!-- Basic Info -->
+                    <div class="form-group">
+                        <label>Your Name</label>
+                        <input type="text" id="edit-profile-name" class="input-field" value="Priya Sharma">
+                    </div>
+                    <div class="form-group" style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                        <div>
+                            <label>Age (Years)</label>
+                            <input type="number" id="edit-profile-age" class="input-field" value="24">
+                        </div>
+                        <div>
+                            <label>Primary Goal</label>
+                            <select id="edit-profile-goal" class="input-field" style="background:#160D27; color:white;">
+                                <option value="Cycle Tracking">Cycle Tracking</option>
+                                <option value="PCOS Management">PCOS Management</option>
+                                <option value="Cramp Relief">Cramp Relief</option>
+                                <option value="Fertility Planning">Fertility Planning</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Body Measurements & BMI -->
+                    <div class="form-group" style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                        <div>
+                            <label>Height (cm)</label>
+                            <input type="number" id="edit-profile-height" class="input-field" value="165">
+                        </div>
+                        <div>
+                            <label>Weight (kg)</label>
+                            <input type="number" id="edit-profile-weight" class="input-field" value="58">
+                        </div>
+                    </div>
+
+                    <!-- Calculated BMI Card -->
+                    <div class="card" style="background:rgba(255,75,130,0.08); border-color:rgba(255,75,130,0.3); padding:10px; margin-bottom:14px; text-align:center;">
+                        <span style="font-size:11px; color:var(--text-muted);">Calculated Body Mass Index (BMI):</span>
+                        <strong style="font-size:13px; color:#FF8FB3; display:block; margin-top:2px;" id="edit-profile-bmi-val">21.3 kg/m² (Normal Weight)</strong>
+                    </div>
+
+                    <!-- Cycle Parameters -->
+                    <div class="form-group" style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                        <div>
+                            <label>Avg Cycle (Days)</label>
+                            <input type="number" id="edit-profile-cycle-len" class="input-field" value="28" min="21" max="45">
+                        </div>
+                        <div>
+                            <label>Period Duration (Days)</label>
+                            <input type="number" id="edit-profile-period-len" class="input-field" value="5" min="2" max="10">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Last Period Start Date</label>
+                        <input type="date" id="edit-profile-last-period" class="input-field" value="2026-08-11">
+                    </div>
+
+                    <!-- Caregiver Emergency Contact -->
+                    <div class="form-group">
+                        <label>Caregiver Emergency Contact</label>
+                        <input type="text" id="edit-profile-caregiver" class="input-field" value="Mom 💕 (+91 98765 43210)">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary full-width" id="btn-save-profile-changes">
+                        <i class="fa-solid fa-floppy-disk"></i> Save Profile Changes 💾
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- EMERGENCY SOS PANIC MODAL -->
+        <div class="modal-overlay" id="sos-modal">
+            <div class="modal-card sos-modal-card" style="border-color:#FF4B82; text-align:center; padding:20px;">
+                <div class="sos-alarm-pulse" style="font-size:42px; animation: pulse 1s infinite alternate;">🚨</div>
+                <h2 style="color:#FF4B82; font-size:18px; margin:8px 0 2px 0;">EMERGENCY SOS ACTIVATED</h2>
+                <p style="font-size:11px; color:var(--text-muted);">Broadcasting Live GPS Location & Caregiver Alert</p>
+
+                <div class="card" style="background:#1F1124; padding:12px; margin:14px 0; border:1px solid #FF4B82; border-radius:14px;">
+                    <div style="font-size:10px; color:#FF8FB3; font-weight:700; text-transform:uppercase;">Live GPS Location Dispatched:</div>
+                    <div style="font-size:13px; color:white; font-weight:600; margin-top:4px;" id="sos-gps-location">Latitude: 28.6139 | Longitude: 77.2090</div>
+                    <div style="font-size:10px; color:#4EE4A0; margin-top:2px;">Accuracy: High (GPS + Smartwatch BLE Sensor)</div>
+                </div>
+
+                <div class="form-group" style="text-align:left; font-size:12px; margin-bottom:14px;">
+                    <label style="color:var(--text-muted); font-size:11px;">Emergency Alerts Sent To:</label>
+                    <div style="margin-top:4px; display:flex; flex-direction:column; gap:4px;">
+                        <div><i class="fa-solid fa-check-double" style="color:#4EE4A0;"></i> Caregiver: <strong style="color:white;">Mom 💕 (+91 98765 43210)</strong></div>
+                        <div><i class="fa-solid fa-check-double" style="color:#4EE4A0;"></i> Doctor: <strong style="color:white;">Dr. Ananya Sharma</strong></div>
+                        <div><i class="fa-solid fa-check-double" style="color:#4EE4A0;"></i> Women Safety Helpline: <strong style="color:white;">1091 (Broadcasted)</strong></div>
+                    </div>
+                </div>
+
+                <div style="display:flex; gap:10px;">
+                    <a href="tel:1091" class="btn btn-primary half" style="background:linear-gradient(135deg, #FF4B82, #D32F2F); text-decoration:none;"><i class="fa-solid fa-phone"></i> Call 1091</a>
+                    <button class="btn btn-secondary half" id="btn-cancel-sos">Cancel Alert</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- NAV BAR -->
+        <nav class="app-nav">
+            <button class="nav-item active" data-tab="tab-home">
+                <i class="fa-solid fa-house"></i>
+                <span>Home</span>
+            </button>
+            <button class="nav-item" data-tab="tab-doctor">
+                <i class="fa-solid fa-user-doctor"></i>
+                <span>Doctor</span>
+            </button>
+            <button class="nav-item" data-tab="tab-features">
+                <i class="fa-solid fa-sparkles"></i>
+                <span>Features</span>
+            </button>
+            <button class="nav-item" data-tab="tab-calendar">
+                <i class="fa-solid fa-calendar-days"></i>
+                <span>Calendar</span>
+            </button>
+            <button class="nav-item" data-tab="tab-insights">
+                <i class="fa-solid fa-book-open"></i>
+                <span>Insights</span>
+            </button>
+            <button class="nav-item" data-tab="tab-settings">
+                <i class="fa-solid fa-gear"></i>
+                <span>Settings</span>
+            </button>
+        </nav>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
