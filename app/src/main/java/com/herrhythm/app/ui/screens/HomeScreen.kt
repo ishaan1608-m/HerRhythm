@@ -17,7 +17,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -46,6 +45,7 @@ fun HomeScreen(
     reminders: List<Pair<String, String>>,
     onOpenNyraChat: () -> Unit,
     onOpenHealthDetail: () -> Unit,
+    onOpenFitness: () -> Unit,
     onOpenWatchManager: () -> Unit,
     onOpenGynaecologists: () -> Unit,
     onOpenLogPeriodDialog: () -> Unit,
@@ -144,7 +144,7 @@ fun HomeScreen(
             }
         }
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(10.dp))
 
         // ─────────────────────────────────────────────
         // 2. HERO SECTION (PERIOD DAYS LEFT + POOKIE CAT MASCOT)
@@ -460,7 +460,167 @@ fun HomeScreen(
         Spacer(modifier = Modifier.height(18.dp))
 
         // ─────────────────────────────────────────────
-        // 5. WOMEN SAFETY & EMERGENCY SHIELD (FAKE CALL & SOS)
+        // 5. HEALTH & FITNESS PROGRAMS HERO CARD
+        // ─────────────────────────────────────────────
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(22.dp))
+                .background(PookieCardBg)
+                .clickable { onOpenFitness() }
+                .padding(18.dp)
+        ) {
+            Column {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Box(
+                            modifier = Modifier
+                                .size(40.dp)
+                                .clip(CircleShape)
+                                .background(PookiePinkPrimary.copy(alpha = 0.25f)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text("🔥", fontSize = 20.sp)
+                        }
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Column {
+                            Text("Guided Fitness & Workouts", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                            Text("Weight Loss, Yoga, HIIT & Cycle Sync", fontSize = 11.sp, color = PookiePinkGlow)
+                        }
+                    }
+
+                    Text("Explore →", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = PookiePinkPrimary)
+                }
+
+                Spacer(modifier = Modifier.height(14.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    listOf("Weight Loss 🔥", "Yoga Flow 🧘", "Cycle Sync 🌸", "HIIT Boost ⚡").forEach { prog ->
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .clip(RoundedCornerShape(10.dp))
+                                .background(PookieCardLight)
+                                .padding(vertical = 8.dp, horizontal = 4.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(prog, fontSize = 10.sp, color = Color.White, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center)
+                        }
+                    }
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(18.dp))
+
+        // ─────────────────────────────────────────────
+        // 6. TODAY'S VITALS SNAPSHOT
+        // ─────────────────────────────────────────────
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(22.dp))
+                .background(PookieCardBg)
+                .clickable { onOpenHealthDetail() }
+                .padding(18.dp)
+        ) {
+            Column {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Box(
+                            modifier = Modifier
+                                .size(36.dp)
+                                .clip(CircleShape)
+                                .background(PookieLavender.copy(alpha = 0.25f)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(Icons.Default.Favorite, contentDescription = null, tint = PookiePinkPrimary, modifier = Modifier.size(18.dp))
+                        }
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Text("Today's Vitals Snapshot", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                    }
+                    Text("Vitals Details →", fontSize = 11.sp, color = PookiePinkPrimary, fontWeight = FontWeight.Bold)
+                }
+
+                Spacer(modifier = Modifier.height(14.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceAround
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text("${healthSnapshot.heartRate}", fontSize = 18.sp, fontWeight = FontWeight.ExtraBold, color = PookiePinkPrimary)
+                        Text("Heart Rate (bpm)", fontSize = 10.sp, color = PookieTextMuted)
+                    }
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text("${healthSnapshot.edaStress}/100", fontSize = 18.sp, fontWeight = FontWeight.ExtraBold, color = HealthOrange)
+                        Text("Stress Score", fontSize = 10.sp, color = PookieTextMuted)
+                    }
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text("${healthSnapshot.sleepHours}h", fontSize = 18.sp, fontWeight = FontWeight.ExtraBold, color = PookieLavender)
+                        Text("Sleep", fontSize = 10.sp, color = PookieTextMuted)
+                    }
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text("${healthSnapshot.recoveryScore}%", fontSize = 18.sp, fontWeight = FontWeight.ExtraBold, color = HealthGreen)
+                        Text("Recovery", fontSize = 10.sp, color = PookieTextMuted)
+                    }
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(18.dp))
+
+        // ─────────────────────────────────────────────
+        // 7. GYNAECOLOGISTS SPECIALISTS CARD
+        // ─────────────────────────────────────────────
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(20.dp))
+                .background(PookieCardBg)
+                .clickable { onOpenGynaecologists() }
+                .padding(16.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
+                    Box(
+                        modifier = Modifier
+                            .size(44.dp)
+                            .clip(CircleShape)
+                            .background(Brush.radialGradient(listOf(PookiePinkPrimary, PookieLavender))),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("👩‍⚕️", fontSize = 22.sp)
+                    }
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Column {
+                        Text("Consult Top Gynaecologists", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                        Text("Online Video Calls & Clinic Visits", fontSize = 11.sp, color = PookieTextMuted)
+                    }
+                }
+                Text("Book →", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = PookiePinkPrimary)
+            }
+        }
+
+        Spacer(modifier = Modifier.height(18.dp))
+
+        // ─────────────────────────────────────────────
+        // 8. WOMEN SAFETY & EMERGENCY SHIELD (FAKE CALL & SOS)
         // ─────────────────────────────────────────────
         Box(
             modifier = Modifier
@@ -533,45 +693,7 @@ fun HomeScreen(
         Spacer(modifier = Modifier.height(18.dp))
 
         // ─────────────────────────────────────────────
-        // 6. GYNAECOLOGISTS BANNER
-        // ─────────────────────────────────────────────
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(20.dp))
-                .background(PookieCardBg)
-                .clickable { onOpenGynaecologists() }
-                .padding(16.dp)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
-                    Box(
-                        modifier = Modifier
-                            .size(44.dp)
-                            .clip(CircleShape)
-                            .background(Brush.radialGradient(listOf(PookiePinkPrimary, PookieLavender))),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text("👩‍⚕️", fontSize = 22.sp)
-                    }
-                    Spacer(modifier = Modifier.width(12.dp))
-                    Column {
-                        Text("Consult Top Gynaecologists", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Color.White)
-                        Text("Online Video Calls & Clinic Visits", fontSize = 11.sp, color = PookieTextMuted)
-                    }
-                }
-                Text("Book →", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = PookiePinkPrimary)
-            }
-        }
-
-        Spacer(modifier = Modifier.height(18.dp))
-
-        // ─────────────────────────────────────────────
-        // 7. NYRA DAILY AI INSIGHT
+        // 9. NYRA DAILY AI INSIGHT
         // ─────────────────────────────────────────────
         Box(
             modifier = Modifier

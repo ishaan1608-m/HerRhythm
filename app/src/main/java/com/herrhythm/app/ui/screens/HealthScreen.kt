@@ -31,14 +31,24 @@ fun HealthScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(DeepVioletBg)
+            .background(PookieDarkBg)
             .verticalScroll(scrollState)
-            .padding(20.dp)
+            .padding(horizontal = 20.dp, vertical = 16.dp)
     ) {
-        Text("Health Dashboard", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
-        Text("Real-time physiological signals & insights", fontSize = 13.sp, color = TextSecondary)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 8.dp, bottom = 12.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column {
+                Text("Health & Vitals Dashboard", fontSize = 22.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                Text("Real-time physiological signals & recovery insights", fontSize = 12.sp, color = PookieTextMuted)
+            }
+        }
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(14.dp))
 
         // 1. Heart Rate & HRV Section
         ExpandableHealthDetailCard(
@@ -46,7 +56,7 @@ fun HealthScreen(
             metricValue = "${snapshot.heartRate} bpm",
             interpretation = if (snapshot.hrv > 50) "Recovery is optimal. HRV is 54ms (slightly above weekly average)." else "Elevated strain detected.",
             icon = Icons.Default.Favorite,
-            accentColor = PrimaryMagenta,
+            accentColor = PookiePinkPrimary,
             details = listOf(
                 "Resting Heart Rate" to "${snapshot.restingHeartRate} bpm",
                 "Heart Rate Variability (HRV)" to "${snapshot.hrv} ms",
@@ -54,7 +64,7 @@ fun HealthScreen(
             )
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(14.dp))
 
         // 2. Blood Oxygen (SpO2)
         ExpandableHealthDetailCard(
@@ -70,13 +80,13 @@ fun HealthScreen(
             )
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(14.dp))
 
         // 3. Stress & EDA Arousal
         ExpandableHealthDetailCard(
             title = "Stress & EDA Arousal",
             metricValue = "${snapshot.edaStress} / 100",
-            interpretation = if (snapshot.edaStress < 40) "Physiological arousal is low. Your nervous system is balanced." else "Elevated EDA signals detected.",
+            interpretation = if (snapshot.edaStress < 40) "Physiological arousal is low. Your nervous system is calm and balanced." else "Elevated EDA signals detected.",
             icon = Icons.Default.SelfImprovement,
             accentColor = HealthOrange,
             details = listOf(
@@ -86,7 +96,7 @@ fun HealthScreen(
             )
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(14.dp))
 
         // 4. Skin Temperature
         ExpandableHealthDetailCard(
@@ -94,7 +104,7 @@ fun HealthScreen(
             metricValue = "${snapshot.temperature} °C",
             interpretation = "Temperature variance is +0.1°C relative to baseline, consistent with normal follicular phase.",
             icon = Icons.Default.Thermostat,
-            accentColor = LightPinkGlow,
+            accentColor = PookiePinkGlow,
             details = listOf(
                 "Nightly Deviation" to "+0.1 °C",
                 "Baseline Reference" to "36.5 °C",
@@ -102,7 +112,7 @@ fun HealthScreen(
             )
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(14.dp))
 
         // 5. Sleep Analysis
         ExpandableHealthDetailCard(
@@ -110,7 +120,7 @@ fun HealthScreen(
             metricValue = "${snapshot.sleepHours} hrs",
             interpretation = "Sleep score is ${snapshot.sleepQualityScore}/100. Deep & REM sleep cycles were well distributed.",
             icon = Icons.Default.Bedtime,
-            accentColor = RadiantPurple,
+            accentColor = PookieLavender,
             details = listOf(
                 "Deep Sleep" to "1h 45m (23%)",
                 "REM Sleep" to "2h 10m (28%)",
@@ -118,6 +128,8 @@ fun HealthScreen(
                 "Sleep Consistency" to "92%"
             )
         )
+
+        Spacer(modifier = Modifier.height(30.dp))
     }
 }
 
@@ -132,12 +144,15 @@ fun ExpandableHealthDetailCard(
 ) {
     var expanded by remember { mutableStateOf(false) }
 
-    GlassCard(
+    Box(
         modifier = Modifier
             .fillMaxWidth()
+            .clip(RoundedCornerShape(20.dp))
+            .background(PookieCardBg)
             .clickable { expanded = !expanded }
+            .padding(18.dp)
     ) {
-        Column(modifier = Modifier.padding(18.dp)) {
+        Column {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -146,16 +161,16 @@ fun ExpandableHealthDetailCard(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Box(
                         modifier = Modifier
-                            .size(36.dp)
+                            .size(40.dp)
                             .clip(CircleShape)
                             .background(accentColor.copy(alpha = 0.2f)),
                         contentAlignment = Alignment.Center
                     ) {
-                        Icon(icon, contentDescription = null, tint = accentColor, modifier = Modifier.size(20.dp))
+                        Icon(icon, contentDescription = null, tint = accentColor, modifier = Modifier.size(22.dp))
                     }
                     Spacer(modifier = Modifier.width(12.dp))
                     Column {
-                        Text(title, fontSize = 15.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
+                        Text(title, fontSize = 15.sp, fontWeight = FontWeight.Bold, color = Color.White)
                         Text(metricValue, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = accentColor)
                     }
                 }
@@ -163,7 +178,7 @@ fun ExpandableHealthDetailCard(
                 Icon(
                     imageVector = if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
                     contentDescription = null,
-                    tint = TextMuted
+                    tint = PookieTextMuted
                 )
             }
 
@@ -174,20 +189,20 @@ fun ExpandableHealthDetailCard(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(12.dp))
-                    .background(CardSurface)
+                    .background(PookieCardLight)
                     .padding(12.dp)
             ) {
                 Text(
                     text = "💡 What this means: $interpretation",
                     fontSize = 12.sp,
-                    color = TextSecondary,
+                    color = Color.White.copy(alpha = 0.9f),
                     lineHeight = 17.sp
                 )
             }
 
             if (expanded) {
                 Spacer(modifier = Modifier.height(14.dp))
-                Divider(color = GlassCardBorder, thickness = 0.8.dp)
+                HorizontalDivider(color = PookieCardLight, thickness = 1.dp)
                 Spacer(modifier = Modifier.height(12.dp))
 
                 details.forEach { (label, value) ->
@@ -197,8 +212,8 @@ fun ExpandableHealthDetailCard(
                             .padding(vertical = 4.dp),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Text(label, fontSize = 13.sp, color = TextMuted)
-                        Text(value, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = TextPrimary)
+                        Text(label, fontSize = 13.sp, color = PookieTextMuted)
+                        Text(value, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = Color.White)
                     }
                 }
             }

@@ -18,6 +18,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -48,19 +49,23 @@ fun FitnessScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(CreamBg)
+            .background(PookieDarkBg)
             .verticalScroll(scrollState)
-            .padding(20.dp)
+            .padding(horizontal = 20.dp, vertical = 16.dp)
     ) {
-        // Header
+        // ─────────────────────────────────────────────
+        // 1. HEADER
+        // ─────────────────────────────────────────────
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 8.dp, bottom = 12.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column {
-                Text("Fitness & Programs", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
-                Text("Daily guided routines designed for women 🌸", fontSize = 13.sp, color = TextSecondary)
+                Text("Health & Fitness Programs", fontSize = 22.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                Text("Guided workouts & routines designed for women 🌸", fontSize = 12.sp, color = PookieTextMuted)
             }
 
             // Streak Badge
@@ -68,40 +73,49 @@ fun FitnessScreen(
             Box(
                 modifier = Modifier
                     .clip(RoundedCornerShape(20.dp))
-                    .background(SoftRose)
+                    .background(PookieCardBg)
+                    .border(1.dp, PookiePinkPrimary.copy(alpha = 0.5f), RoundedCornerShape(20.dp))
                     .padding(horizontal = 12.dp, vertical = 6.dp)
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.LocalFireDepartment, contentDescription = null, tint = RosePrimary, modifier = Modifier.size(16.dp))
+                    Icon(Icons.Default.LocalFireDepartment, contentDescription = null, tint = PookiePinkPrimary, modifier = Modifier.size(16.dp))
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("$streak Day Streak 🔥", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = RosePrimary)
+                    Text("$streak Day Streak 🔥", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = PookiePinkPrimary)
                 }
             }
         }
 
-        Spacer(modifier = Modifier.height(18.dp))
+        Spacer(modifier = Modifier.height(14.dp))
 
-        // 1. ACTIVE PROGRAM HERO CARD
-        GlassCard(modifier = Modifier.fillMaxWidth()) {
-            Column(modifier = Modifier.padding(18.dp)) {
+        // ─────────────────────────────────────────────
+        // 2. ACTIVE PROGRAM HERO CARD
+        // ─────────────────────────────────────────────
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(22.dp))
+                .background(PookieCardBg)
+                .padding(18.dp)
+        ) {
+            Column {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(currentProgram.emoji, fontSize = 28.sp)
+                        Text(currentProgram.emoji, fontSize = 30.sp)
                         Spacer(modifier = Modifier.width(10.dp))
                         Column {
-                            Text(currentProgram.name, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
-                            Text("${currentProgram.daysPerWeek} Days/Week • ${currentProgram.sessionDurationMin} Min Session", fontSize = 12.sp, color = RosePrimary)
+                            Text(currentProgram.name, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                            Text("${currentProgram.daysPerWeek} Days/Week • ${currentProgram.sessionDurationMin} Mins/Session", fontSize = 12.sp, color = PookiePinkGlow)
                         }
                     }
 
                     if (!isCurrentProgramJoined) {
                         Button(
                             onClick = { fitnessRepository.joinProgram(currentProgram.id) },
-                            colors = ButtonDefaults.buttonColors(containerColor = RosePrimary),
+                            colors = ButtonDefaults.buttonColors(containerColor = PookiePinkPrimary),
                             shape = RoundedCornerShape(12.dp),
                             contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
                         ) {
@@ -114,7 +128,7 @@ fun FitnessScreen(
                                 .background(HealthGreen.copy(alpha = 0.2f))
                                 .padding(horizontal = 10.dp, vertical = 4.dp)
                         ) {
-                            Text("Active ✓", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
+                            Text("Active ✓", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = HealthGreen)
                         }
                     }
                 }
@@ -122,15 +136,15 @@ fun FitnessScreen(
                 Spacer(modifier = Modifier.height(12.dp))
                 Text(
                     text = currentProgram.description,
-                    fontSize = 13.sp,
-                    color = TextSecondary,
-                    lineHeight = 18.sp
+                    fontSize = 12.sp,
+                    color = PookieTextMuted,
+                    lineHeight = 17.sp
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 // Weekly Schedule Strip (Day 1..N)
-                Text("Weekly Schedule", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
+                Text("Weekly Schedule", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = Color.White)
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Row(
@@ -148,14 +162,14 @@ fun FitnessScreen(
                                 .clip(RoundedCornerShape(10.dp))
                                 .background(
                                     when {
-                                        isCompleted -> HealthGreen.copy(alpha = 0.3f)
-                                        isToday -> RosePrimary
-                                        else -> CardSurface
+                                        isCompleted -> HealthGreen.copy(alpha = 0.25f)
+                                        isToday -> PookiePinkPrimary
+                                        else -> PookieCardLight
                                     }
                                 )
                                 .border(
                                     width = if (isToday) 2.dp else 1.dp,
-                                    color = if (isToday) RosePrimary else PeachBorder,
+                                    color = if (isToday) PookiePinkGlow else Color.Transparent,
                                     shape = RoundedCornerShape(10.dp)
                                 )
                                 .clickable {
@@ -168,13 +182,13 @@ fun FitnessScreen(
                                     text = "D${index + 1}",
                                     fontSize = 12.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = if (isToday) Color.White else TextPrimary
+                                    color = Color.White
                                 )
                                 Text(
                                     text = if (isCompleted) "✓" else if (isToday) "TODAY" else "${session.totalDurationMin}m",
                                     fontSize = 9.sp,
                                     fontWeight = FontWeight.SemiBold,
-                                    color = if (isToday) SoftRose else TextMuted
+                                    color = if (isToday) Color.White else PookieTextMuted
                                 )
                             }
                         }
@@ -196,7 +210,7 @@ fun FitnessScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(48.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = RosePrimary),
+                    colors = ButtonDefaults.buttonColors(containerColor = PookiePinkPrimary),
                     shape = RoundedCornerShape(14.dp)
                 ) {
                     Icon(Icons.Default.PlayCircle, contentDescription = null, tint = Color.White, modifier = Modifier.size(20.dp))
@@ -211,11 +225,13 @@ fun FitnessScreen(
             }
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(22.dp))
 
-        // 2. EXPLORE ALL FITNESS PROGRAMS
-        Text("Explore Programs", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
-        Text("Choose what matches your body's energy & goals 💕", fontSize = 12.sp, color = TextSecondary)
+        // ─────────────────────────────────────────────
+        // 3. EXPLORE ALL FITNESS PROGRAMS (HORIZONTALLY SCROLLABLE CARDS)
+        // ─────────────────────────────────────────────
+        Text("Explore All Programs", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.White)
+        Text("Choose what matches your body's energy & phase 💕", fontSize = 12.sp, color = PookieTextMuted)
         Spacer(modifier = Modifier.height(12.dp))
 
         LazyRow(
@@ -242,47 +258,69 @@ fun FitnessScreen(
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        // 3. DAILY ACTIVITY METRICS (STEPS, CALORIES, DISTANCE)
-        GlassCard(modifier = Modifier.fillMaxWidth()) {
-            Column(modifier = Modifier.padding(18.dp)) {
-                Text("Today's Activity", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
+        // ─────────────────────────────────────────────
+        // 4. DAILY ACTIVITY METRICS (STEPS, CALORIES, DISTANCE)
+        // ─────────────────────────────────────────────
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(22.dp))
+                .background(PookieCardBg)
+                .padding(18.dp)
+        ) {
+            Column {
+                Text("Today's Activity & Calorie Burn", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = Color.White)
                 Spacer(modifier = Modifier.height(14.dp))
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceAround
                 ) {
-                    ActivityMetricRing(label = "Steps", current = "${snapshot.steps}", target = "8,000", color = RosePrimary)
-                    ActivityMetricRing(label = "Calories", current = "${snapshot.caloriesBurned}", target = "450 kcal", color = DustyRose)
-                    ActivityMetricRing(label = "Distance", current = "${snapshot.distanceKm} km", target = "5.0 km", color = HealthBlue)
+                    ActivityMetricRing(label = "Steps", current = "${snapshot.steps}", target = "8,000", color = PookiePinkPrimary)
+                    ActivityMetricRing(label = "Calories", current = "${snapshot.caloriesBurned}", target = "450 kcal", color = PookieLavender)
+                    ActivityMetricRing(label = "Distance", current = "${snapshot.distanceKm} km", target = "5.0 km", color = HealthGreen)
                 }
             }
         }
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        // 4. NYRA AI WORKOUT GENERATOR
-        GlassCard(modifier = Modifier.fillMaxWidth()) {
-            Column(modifier = Modifier.padding(16.dp)) {
+        // ─────────────────────────────────────────────
+        // 5. NYRA AI WORKOUT GENERATOR
+        // ─────────────────────────────────────────────
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(22.dp))
+                .background(PookieCardBg)
+                .padding(18.dp)
+        ) {
+            Column {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.AutoAwesome, contentDescription = null, tint = RosePrimary)
+                    Icon(Icons.Default.AutoAwesome, contentDescription = null, tint = PookiePinkGlow, modifier = Modifier.size(20.dp))
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Ask NYRA for a Custom Workout", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
+                    Text("Ask NYRA for a Custom Workout", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = Color.White)
                 }
                 Spacer(modifier = Modifier.height(6.dp))
                 Text(
-                    "Need a shorter routine or something light for cramps? NYRA can customize a plan on the fly.",
+                    text = "Need a quick 10-minute session, cramp-relief yoga, or low-energy stretch? NYRA generates tailored workouts on the fly.",
                     fontSize = 12.sp,
-                    color = TextSecondary
+                    color = PookieTextMuted,
+                    lineHeight = 16.sp
                 )
                 Spacer(modifier = Modifier.height(12.dp))
-                PrimaryGradientButton(
-                    text = "Ask NYRA for Tailored Plan ✨",
+                Button(
                     onClick = onGenerateWorkout,
+                    colors = ButtonDefaults.buttonColors(containerColor = PookieLavender),
+                    shape = RoundedCornerShape(12.dp),
                     modifier = Modifier.fillMaxWidth()
-                )
+                ) {
+                    Text("Ask NYRA for Tailored Plan ✨", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                }
             }
         }
+
+        Spacer(modifier = Modifier.height(30.dp))
     }
 }
 
@@ -298,10 +336,10 @@ fun ProgramCard(
         modifier = Modifier
             .width(220.dp)
             .clip(RoundedCornerShape(18.dp))
-            .background(if (isSelected) CreamCard else WarmSurface)
+            .background(if (isSelected) PookieCardLight else PookieCardBg)
             .border(
                 width = if (isSelected) 2.dp else 1.dp,
-                color = if (isSelected) RosePrimary else PeachBorder,
+                color = if (isSelected) PookiePinkPrimary else Color.White.copy(alpha = 0.1f),
                 shape = RoundedCornerShape(18.dp)
             )
             .clickable { onSelect() }
@@ -313,7 +351,7 @@ fun ProgramCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(program.emoji, fontSize = 24.sp)
+                Text(program.emoji, fontSize = 26.sp)
                 if (isJoined) {
                     Box(
                         modifier = Modifier
@@ -321,7 +359,7 @@ fun ProgramCard(
                             .background(HealthGreen.copy(alpha = 0.2f))
                             .padding(horizontal = 6.dp, vertical = 2.dp)
                     ) {
-                        Text("Joined", fontSize = 10.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
+                        Text("Joined", fontSize = 10.sp, fontWeight = FontWeight.Bold, color = HealthGreen)
                     }
                 }
             }
@@ -330,16 +368,16 @@ fun ProgramCard(
 
             Text(
                 text = program.name,
-                fontSize = 15.sp,
+                fontSize = 14.sp,
                 fontWeight = FontWeight.Bold,
-                color = TextPrimary
+                color = Color.White
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = "${program.daysPerWeek}d/wk • ${program.sessionDurationMin}m • ${program.difficulty}",
                 fontSize = 11.sp,
                 fontWeight = FontWeight.SemiBold,
-                color = RosePrimary
+                color = PookiePinkGlow
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -348,7 +386,7 @@ fun ProgramCard(
                 Text(
                     text = highlight,
                     fontSize = 11.sp,
-                    color = TextSecondary,
+                    color = PookieTextMuted,
                     maxLines = 1
                 )
             }
@@ -361,7 +399,7 @@ fun ProgramCard(
                     .fillMaxWidth()
                     .height(36.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = if (isSelected) RosePrimary else DustyRose
+                    containerColor = if (isSelected) PookiePinkPrimary else PookieLavender
                 ),
                 shape = RoundedCornerShape(10.dp),
                 contentPadding = PaddingValues(0.dp)
@@ -380,15 +418,15 @@ fun ActivityMetricRing(label: String, current: String, target: String, color: Co
                 .size(72.dp)
                 .clip(CircleShape)
                 .border(3.dp, color, CircleShape)
-                .background(CardSurface),
+                .background(PookieCardLight),
             contentAlignment = Alignment.Center
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(current, fontSize = 13.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
-                Text(target, fontSize = 10.sp, color = TextMuted)
+                Text(current, fontSize = 13.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                Text(target, fontSize = 9.sp, color = PookieTextMuted)
             }
         }
         Spacer(modifier = Modifier.height(6.dp))
-        Text(label, fontSize = 12.sp, color = TextSecondary)
+        Text(label, fontSize = 11.sp, color = Color.White, fontWeight = FontWeight.Medium)
     }
 }

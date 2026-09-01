@@ -37,7 +37,6 @@ fun GynaecologistScreen(
     onBack: () -> Unit
 ) {
     var selectedCategory by remember { mutableStateOf("All") }
-    var selectedConsultationMode by remember { mutableStateOf("All") } // All, Online, In-Clinic
     var searchQuery by remember { mutableStateOf("") }
     var doctorToBook by remember { mutableStateOf<Doctor?>(null) }
     var activeTab by remember { mutableIntStateOf(0) } // 0 = Find Doctors, 1 = My Appointments
@@ -83,49 +82,47 @@ fun GynaecologistScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(CreamBg)
-            .padding(16.dp)
+            .background(PookieDarkBg)
+            .padding(horizontal = 20.dp, vertical = 16.dp)
     ) {
         // Top Bar
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 6.dp),
+                .padding(top = 8.dp, bottom = 12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(
                 onClick = onBack,
                 modifier = Modifier
-                    .size(38.dp)
+                    .size(40.dp)
                     .clip(CircleShape)
-                    .background(CardSurface)
+                    .background(PookieCardBg)
             ) {
-                Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = TextPrimary)
+                Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.White)
             }
 
             Spacer(modifier = Modifier.width(12.dp))
 
             Column(modifier = Modifier.weight(1f)) {
-                Text("Gynaecologists & Specialists", fontSize = 17.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
-                Text("Verified women's health doctors 👩‍⚕️", fontSize = 12.sp, color = TextSecondary)
+                Text("Gynaecologists & Specialists", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                Text("Verified women's health doctors 👩‍⚕️", fontSize = 12.sp, color = PookieTextMuted)
             }
         }
-
-        Spacer(modifier = Modifier.height(10.dp))
 
         // TAB SELECTOR: Find Doctors vs My Appointments
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(14.dp))
-                .background(CardSurface)
+                .background(PookieCardBg)
                 .padding(4.dp)
         ) {
             Box(
                 modifier = Modifier
                     .weight(1f)
                     .clip(RoundedCornerShape(10.dp))
-                    .background(if (activeTab == 0) RosePrimary else Color.Transparent)
+                    .background(if (activeTab == 0) PookiePinkPrimary else Color.Transparent)
                     .clickable { activeTab = 0 }
                     .padding(vertical = 10.dp),
                 contentAlignment = Alignment.Center
@@ -134,7 +131,7 @@ fun GynaecologistScreen(
                     text = "Find Doctors 🩺",
                     fontSize = 13.sp,
                     fontWeight = FontWeight.Bold,
-                    color = if (activeTab == 0) Color.White else TextPrimary
+                    color = Color.White
                 )
             }
 
@@ -142,7 +139,7 @@ fun GynaecologistScreen(
                 modifier = Modifier
                     .weight(1f)
                     .clip(RoundedCornerShape(10.dp))
-                    .background(if (activeTab == 1) RosePrimary else Color.Transparent)
+                    .background(if (activeTab == 1) PookiePinkPrimary else Color.Transparent)
                     .clickable { activeTab = 1 }
                     .padding(vertical = 10.dp),
                 contentAlignment = Alignment.Center
@@ -152,22 +149,22 @@ fun GynaecologistScreen(
                         text = "My Appointments",
                         fontSize = 13.sp,
                         fontWeight = FontWeight.Bold,
-                        color = if (activeTab == 1) Color.White else TextPrimary
+                        color = Color.White
                     )
                     if (appointments.isNotEmpty()) {
-                        Spacer(modifier = Modifier.width(4.dp))
+                        Spacer(modifier = Modifier.width(6.dp))
                         Box(
                             modifier = Modifier
                                 .size(18.dp)
                                 .clip(CircleShape)
-                                .background(if (activeTab == 1) Color.White else RosePrimary),
+                                .background(if (activeTab == 1) Color.White else PookiePinkPrimary),
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
                                 text = "${appointments.size}",
                                 fontSize = 10.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = if (activeTab == 1) RosePrimary else Color.White
+                                color = if (activeTab == 1) PookiePinkPrimary else Color.White
                             )
                         }
                     }
@@ -182,15 +179,17 @@ fun GynaecologistScreen(
             OutlinedTextField(
                 value = searchQuery,
                 onValueChange = { searchQuery = it },
-                placeholder = { Text("Search doctor, PCOS, fertility, clinic...", fontSize = 13.sp, color = TextMuted) },
-                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = RosePrimary) },
+                placeholder = { Text("Search doctor, PCOS, fertility, clinic...", fontSize = 13.sp, color = PookieTextMuted) },
+                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = PookiePinkPrimary) },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(14.dp),
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = RosePrimary,
-                    unfocusedBorderColor = PeachBorder,
-                    focusedContainerColor = CreamCard,
-                    unfocusedContainerColor = CreamCard
+                    focusedBorderColor = PookiePinkPrimary,
+                    unfocusedBorderColor = PookieCardLight,
+                    focusedTextColor = Color.White,
+                    unfocusedTextColor = Color.White,
+                    focusedContainerColor = PookieCardBg,
+                    unfocusedContainerColor = PookieCardBg
                 )
             )
 
@@ -206,8 +205,8 @@ fun GynaecologistScreen(
                     Box(
                         modifier = Modifier
                             .clip(RoundedCornerShape(12.dp))
-                            .background(if (isSelected) RosePrimary else CardSurface)
-                            .border(1.dp, if (isSelected) RosePrimary else PeachBorder, RoundedCornerShape(12.dp))
+                            .background(if (isSelected) PookiePinkPrimary else PookieCardBg)
+                            .border(1.dp, if (isSelected) PookiePinkGlow else PookieCardLight, RoundedCornerShape(12.dp))
                             .clickable { selectedCategory = category }
                             .padding(horizontal = 12.dp, vertical = 6.dp)
                     ) {
@@ -215,7 +214,7 @@ fun GynaecologistScreen(
                             text = category,
                             fontSize = 12.sp,
                             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                            color = if (isSelected) Color.White else TextPrimary
+                            color = Color.White
                         )
                     }
                 }
@@ -245,12 +244,12 @@ fun GynaecologistScreen(
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text("📅", fontSize = 40.sp)
                         Spacer(modifier = Modifier.height(10.dp))
-                        Text("No Appointments Booked Yet", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
-                        Text("Consult top gynecologists online or at clinic", fontSize = 12.sp, color = TextSecondary)
+                        Text("No Appointments Booked Yet", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                        Text("Consult top gynecologists online or at clinic", fontSize = 12.sp, color = PookieTextMuted)
                         Spacer(modifier = Modifier.height(14.dp))
                         Button(
                             onClick = { activeTab = 0 },
-                            colors = ButtonDefaults.buttonColors(containerColor = RosePrimary),
+                            colors = ButtonDefaults.buttonColors(containerColor = PookiePinkPrimary),
                             shape = RoundedCornerShape(12.dp)
                         ) {
                             Text("Book Consultation Now →", color = Color.White, fontWeight = FontWeight.Bold)
@@ -279,8 +278,14 @@ fun DoctorCard(
     doctor: Doctor,
     onBook: () -> Unit
 ) {
-    GlassCard(modifier = Modifier.fillMaxWidth()) {
-        Column(modifier = Modifier.padding(16.dp)) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(20.dp))
+            .background(PookieCardBg)
+            .padding(16.dp)
+    ) {
+        Column {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -292,8 +297,8 @@ fun DoctorCard(
                         modifier = Modifier
                             .size(54.dp)
                             .clip(CircleShape)
-                            .background(Brush.radialGradient(listOf(SoftRose, CardSurface)))
-                            .border(2.dp, RosePrimary, CircleShape),
+                            .background(Brush.radialGradient(listOf(PookiePinkPrimary.copy(alpha = 0.3f), PookieCardLight)))
+                            .border(2.dp, PookiePinkPrimary, CircleShape),
                         contentAlignment = Alignment.Center
                     ) {
                         Text("👩‍⚕️", fontSize = 28.sp)
@@ -302,10 +307,10 @@ fun DoctorCard(
                     Spacer(modifier = Modifier.width(12.dp))
 
                     Column {
-                        Text(doctor.name, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
-                        Text(doctor.title, fontSize = 11.sp, color = TextMuted, maxLines = 1)
+                        Text(doctor.name, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                        Text(doctor.title, fontSize = 11.sp, color = PookieTextMuted, maxLines = 1)
                         Spacer(modifier = Modifier.height(2.dp))
-                        Text(doctor.qualifications, fontSize = 10.sp, color = TextSecondary, maxLines = 1)
+                        Text(doctor.qualifications, fontSize = 10.sp, color = PookiePinkGlow, maxLines = 1)
                     }
                 }
 
@@ -313,10 +318,10 @@ fun DoctorCard(
                 Box(
                     modifier = Modifier
                         .clip(RoundedCornerShape(8.dp))
-                        .background(SoftRose)
+                        .background(PookiePinkPrimary.copy(alpha = 0.2f))
                         .padding(horizontal = 6.dp, vertical = 3.dp)
                 ) {
-                    Text(doctor.badgeTag, fontSize = 10.sp, fontWeight = FontWeight.Bold, color = RosePrimary)
+                    Text(doctor.badgeTag, fontSize = 10.sp, fontWeight = FontWeight.Bold, color = PookiePinkGlow)
                 }
             }
 
@@ -330,29 +335,29 @@ fun DoctorCard(
                 Row(
                     modifier = Modifier
                         .clip(RoundedCornerShape(6.dp))
-                        .background(WarmSurface)
+                        .background(PookieCardLight)
                         .padding(horizontal = 6.dp, vertical = 2.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("⭐ ${doctor.rating} (${doctor.reviewCount}+)", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
+                    Text("⭐ ${doctor.rating} (${doctor.reviewCount}+)", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color.White)
                 }
 
                 Row(
                     modifier = Modifier
                         .clip(RoundedCornerShape(6.dp))
-                        .background(WarmSurface)
+                        .background(PookieCardLight)
                         .padding(horizontal = 6.dp, vertical = 2.dp)
                 ) {
-                    Text("⏳ ${doctor.experienceYears} yrs exp", fontSize = 11.sp, color = TextPrimary)
+                    Text("⏳ ${doctor.experienceYears} yrs exp", fontSize = 11.sp, color = Color.White)
                 }
 
                 Row(
                     modifier = Modifier
                         .clip(RoundedCornerShape(6.dp))
-                        .background(WarmSurface)
+                        .background(PookieCardLight)
                         .padding(horizontal = 6.dp, vertical = 2.dp)
                 ) {
-                    Text("📍 ${doctor.distanceKm} km", fontSize = 11.sp, color = TextPrimary)
+                    Text("📍 ${doctor.distanceKm} km", fontSize = 11.sp, color = Color.White)
                 }
             }
 
@@ -361,7 +366,7 @@ fun DoctorCard(
             Text(
                 text = "🏥 ${doctor.hospitalClinicName} — ${doctor.clinicAddress}",
                 fontSize = 11.sp,
-                color = TextSecondary,
+                color = PookieTextMuted,
                 maxLines = 1
             )
 
@@ -374,18 +379,18 @@ fun DoctorCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Column {
-                    Text("Consultation Fee", fontSize = 10.sp, color = TextMuted)
+                    Text("Consultation Fee", fontSize = 10.sp, color = PookieTextMuted)
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text("₹${doctor.onlineFee}", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = RosePrimary)
-                        Text(" (Online)", fontSize = 11.sp, color = TextSecondary)
-                        Text(" • ₹${doctor.inClinicFee}", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
-                        Text(" (Clinic)", fontSize = 11.sp, color = TextSecondary)
+                        Text("₹${doctor.onlineFee}", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = PookiePinkPrimary)
+                        Text(" (Online)", fontSize = 11.sp, color = PookieTextMuted)
+                        Text(" • ₹${doctor.inClinicFee}", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                        Text(" (Clinic)", fontSize = 11.sp, color = PookieTextMuted)
                     }
                 }
 
                 Button(
                     onClick = onBook,
-                    colors = ButtonDefaults.buttonColors(containerColor = RosePrimary),
+                    colors = ButtonDefaults.buttonColors(containerColor = PookiePinkPrimary),
                     shape = RoundedCornerShape(12.dp),
                     contentPadding = PaddingValues(horizontal = 16.dp, vertical = 6.dp)
                 ) {
@@ -410,8 +415,14 @@ fun AppointmentCard(
         )
     }
 
-    GlassCard(modifier = Modifier.fillMaxWidth()) {
-        Column(modifier = Modifier.padding(16.dp)) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(20.dp))
+            .background(PookieCardBg)
+            .padding(16.dp)
+    ) {
+        Column {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -421,22 +432,22 @@ fun AppointmentCard(
                     Text("👩‍⚕️", fontSize = 22.sp)
                     Spacer(modifier = Modifier.width(8.dp))
                     Column {
-                        Text(appointment.doctorName, fontSize = 15.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
-                        Text(appointment.doctorSpecialty, fontSize = 11.sp, color = RosePrimary)
+                        Text(appointment.doctorName, fontSize = 15.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                        Text(appointment.doctorSpecialty, fontSize = 11.sp, color = PookiePinkGlow)
                     }
                 }
 
                 Box(
                     modifier = Modifier
                         .clip(RoundedCornerShape(8.dp))
-                        .background(if (appointment.status == "Confirmed") HealthGreen.copy(alpha = 0.2f) else Color.LightGray.copy(alpha = 0.3f))
+                        .background(if (appointment.status == "Confirmed") HealthGreen.copy(alpha = 0.2f) else Color.LightGray.copy(alpha = 0.2f))
                         .padding(horizontal = 8.dp, vertical = 4.dp)
                 ) {
                     Text(
                         appointment.status,
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Bold,
-                        color = if (appointment.status == "Confirmed") HealthGreen else TextMuted
+                        color = if (appointment.status == "Confirmed") HealthGreen else PookieTextMuted
                     )
                 }
             }
@@ -447,20 +458,20 @@ fun AppointmentCard(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(10.dp))
-                    .background(WarmSurface)
+                    .background(PookieCardLight)
                     .padding(10.dp)
             ) {
                 Column {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.Event, contentDescription = null, tint = RosePrimary, modifier = Modifier.size(16.dp))
+                        Icon(Icons.Default.Event, contentDescription = null, tint = PookiePinkPrimary, modifier = Modifier.size(16.dp))
                         Spacer(modifier = Modifier.width(6.dp))
-                        Text("${appointment.date} at ${appointment.timeSlot}", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
+                        Text("${appointment.date} at ${appointment.timeSlot}", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.White)
                     }
                     Spacer(modifier = Modifier.height(4.dp))
-                    Text("Type: ${appointment.consultationType} • Fee: ${appointment.feePaid}", fontSize = 11.sp, color = TextSecondary)
+                    Text("Type: ${appointment.consultationType} • Fee: ${appointment.feePaid}", fontSize = 11.sp, color = PookieTextMuted)
                     if (appointment.patientNotes.isNotBlank()) {
                         Spacer(modifier = Modifier.height(4.dp))
-                        Text("Reason: \"${appointment.patientNotes}\"", fontSize = 11.sp, color = TextMuted)
+                        Text("Reason: \"${appointment.patientNotes}\"", fontSize = 11.sp, color = PookiePinkGlow)
                     }
                 }
             }
@@ -476,7 +487,7 @@ fun AppointmentCard(
                         Button(
                             onClick = { showJoinCallRoom = true },
                             modifier = Modifier.weight(1f),
-                            colors = ButtonDefaults.buttonColors(containerColor = RosePrimary),
+                            colors = ButtonDefaults.buttonColors(containerColor = PookiePinkPrimary),
                             shape = RoundedCornerShape(10.dp)
                         ) {
                             Icon(Icons.Default.Videocam, contentDescription = null, tint = Color.White, modifier = Modifier.size(16.dp))
@@ -516,8 +527,8 @@ fun BookAppointmentDialog(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(20.dp))
-                .background(CreamCard)
-                .border(1.dp, PeachBorder, RoundedCornerShape(20.dp))
+                .background(PookieCardBg)
+                .border(1.dp, PookieCardLight, RoundedCornerShape(20.dp))
                 .padding(18.dp)
         ) {
             Column {
@@ -527,11 +538,11 @@ fun BookAppointmentDialog(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Column {
-                        Text("Book Consultation", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
-                        Text(doctor.name, fontSize = 13.sp, color = RosePrimary, fontWeight = FontWeight.SemiBold)
+                        Text("Book Consultation", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                        Text(doctor.name, fontSize = 13.sp, color = PookiePinkPrimary, fontWeight = FontWeight.SemiBold)
                     }
                     IconButton(onClick = onDismiss) {
-                        Icon(Icons.Default.Close, contentDescription = "Close", tint = TextPrimary)
+                        Icon(Icons.Default.Close, contentDescription = "Close", tint = Color.White)
                     }
                 }
 
@@ -542,37 +553,37 @@ fun BookAppointmentDialog(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(10.dp))
-                        .background(CardSurface)
+                        .background(PookieCardLight)
                         .padding(4.dp)
                 ) {
                     Box(
                         modifier = Modifier
                             .weight(1f)
                             .clip(RoundedCornerShape(8.dp))
-                            .background(if (isOnline) RosePrimary else Color.Transparent)
+                            .background(if (isOnline) PookiePinkPrimary else Color.Transparent)
                             .clickable { isOnline = true }
                             .padding(vertical = 8.dp),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text("🎥 Online Video (₹${doctor.onlineFee})", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = if (isOnline) Color.White else TextPrimary)
+                        Text("🎥 Online (₹${doctor.onlineFee})", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color.White)
                     }
                     Box(
                         modifier = Modifier
                             .weight(1f)
                             .clip(RoundedCornerShape(8.dp))
-                            .background(if (!isOnline) RosePrimary else Color.Transparent)
+                            .background(if (!isOnline) PookiePinkPrimary else Color.Transparent)
                             .clickable { isOnline = false }
                             .padding(vertical = 8.dp),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text("🏥 In-Clinic (₹${doctor.inClinicFee})", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = if (!isOnline) Color.White else TextPrimary)
+                        Text("🏥 Clinic (₹${doctor.inClinicFee})", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color.White)
                     }
                 }
 
                 Spacer(modifier = Modifier.height(14.dp))
 
                 // Date Selection
-                Text("Select Date", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
+                Text("Select Date", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.White)
                 Spacer(modifier = Modifier.height(6.dp))
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     items(dateOptions) { d ->
@@ -580,12 +591,11 @@ fun BookAppointmentDialog(
                         Box(
                             modifier = Modifier
                                 .clip(RoundedCornerShape(8.dp))
-                                .background(if (isSelected) SoftRose else CardSurface)
-                                .border(1.dp, if (isSelected) RosePrimary else PeachBorder, RoundedCornerShape(8.dp))
+                                .background(if (isSelected) PookiePinkPrimary else PookieCardLight)
                                 .clickable { selectedDate = d }
                                 .padding(horizontal = 10.dp, vertical = 6.dp)
                         ) {
-                            Text(d, fontSize = 11.sp, color = if (isSelected) RosePrimary else TextPrimary, fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal)
+                            Text(d, fontSize = 11.sp, color = Color.White, fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal)
                         }
                     }
                 }
@@ -593,7 +603,7 @@ fun BookAppointmentDialog(
                 Spacer(modifier = Modifier.height(12.dp))
 
                 // Slot Selection
-                Text("Available Slots", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
+                Text("Available Slots", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.White)
                 Spacer(modifier = Modifier.height(6.dp))
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     items(doctor.availableSlots) { slot ->
@@ -601,12 +611,11 @@ fun BookAppointmentDialog(
                         Box(
                             modifier = Modifier
                                 .clip(RoundedCornerShape(8.dp))
-                                .background(if (isSelected) RosePrimary else CardSurface)
-                                .border(1.dp, if (isSelected) RosePrimary else PeachBorder, RoundedCornerShape(8.dp))
+                                .background(if (isSelected) PookiePinkPrimary else PookieCardLight)
                                 .clickable { selectedSlot = slot }
                                 .padding(horizontal = 10.dp, vertical = 6.dp)
                         ) {
-                            Text(slot, fontSize = 11.sp, color = if (isSelected) Color.White else TextPrimary, fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal)
+                            Text(slot, fontSize = 11.sp, color = Color.White, fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal)
                         }
                     }
                 }
@@ -617,15 +626,15 @@ fun BookAppointmentDialog(
                 OutlinedTextField(
                     value = notes,
                     onValueChange = { notes = it },
-                    placeholder = { Text("Brief reason for visit (e.g. PCOS checkup, cramps, bleeding)", fontSize = 11.sp, color = TextMuted) },
+                    placeholder = { Text("Brief reason for visit (e.g. PCOS, cramps, irregular cycle)", fontSize = 11.sp, color = PookieTextMuted) },
                     modifier = Modifier.fillMaxWidth(),
                     maxLines = 2,
                     shape = RoundedCornerShape(10.dp),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = RosePrimary,
-                        unfocusedBorderColor = PeachBorder,
-                        focusedContainerColor = CreamBg,
-                        unfocusedContainerColor = CreamBg
+                        focusedTextColor = Color.White,
+                        unfocusedTextColor = Color.White,
+                        focusedContainerColor = PookieCardLight,
+                        unfocusedContainerColor = PookieCardLight
                     )
                 )
 
@@ -636,7 +645,7 @@ fun BookAppointmentDialog(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(46.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = RosePrimary),
+                    colors = ButtonDefaults.buttonColors(containerColor = PookiePinkPrimary),
                     shape = RoundedCornerShape(12.dp)
                 ) {
                     Text("Confirm & Book Appointment ✨", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = Color.White)
@@ -653,14 +662,13 @@ fun VideoConsultationRoomDialog(
 ) {
     var isMuted by remember { mutableStateOf(false) }
     var isVideoOff by remember { mutableStateOf(false) }
-    var inCallChatText by remember { mutableStateOf("") }
 
     Dialog(onDismissRequest = onClose) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .clip(RoundedCornerShape(20.dp))
-                .background(Color(0xFF1E1424))
+                .background(Color(0xFF15132B))
                 .padding(16.dp)
         ) {
             Column(
@@ -688,15 +696,15 @@ fun VideoConsultationRoomDialog(
                         .fillMaxWidth()
                         .weight(1f)
                         .clip(RoundedCornerShape(16.dp))
-                        .background(Color(0xFF2C1D36))
-                        .border(1.dp, RosePrimary, RoundedCornerShape(16.dp)),
+                        .background(Color(0xFF221F3E))
+                        .border(1.dp, PookiePinkPrimary, RoundedCornerShape(16.dp)),
                     contentAlignment = Alignment.Center
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text("👩‍⚕️", fontSize = 60.sp)
                         Spacer(modifier = Modifier.height(10.dp))
                         Text(appointment.doctorName, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
-                        Text(appointment.doctorSpecialty, fontSize = 12.sp, color = SoftRose)
+                        Text(appointment.doctorSpecialty, fontSize = 12.sp, color = PookiePinkGlow)
                         Spacer(modifier = Modifier.height(6.dp))
                         Box(
                             modifier = Modifier
@@ -704,7 +712,7 @@ fun VideoConsultationRoomDialog(
                                 .background(HealthGreen.copy(alpha = 0.3f))
                                 .padding(horizontal = 8.dp, vertical = 2.dp)
                         ) {
-                            Text("● Doctor is listening", fontSize = 10.sp, color = HealthGreen, fontWeight = FontWeight.Bold)
+                            Text("● Doctor is connected & listening", fontSize = 10.sp, color = HealthGreen, fontWeight = FontWeight.Bold)
                         }
                     }
 
@@ -715,7 +723,7 @@ fun VideoConsultationRoomDialog(
                             .padding(12.dp)
                             .size(70.dp, 90.dp)
                             .clip(RoundedCornerShape(10.dp))
-                            .background(Color(0xFF4A345B))
+                            .background(Color(0xFF2C2850))
                             .border(1.dp, Color.White, RoundedCornerShape(10.dp)),
                         contentAlignment = Alignment.Center
                     ) {

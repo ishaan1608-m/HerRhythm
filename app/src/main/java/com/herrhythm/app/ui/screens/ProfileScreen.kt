@@ -44,44 +44,46 @@ fun ProfileScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(CreamBg)
+            .background(PookieDarkBg)
             .verticalScroll(scrollState)
-            .padding(20.dp)
+            .padding(horizontal = 20.dp, vertical = 16.dp)
     ) {
         // User Profile Header
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 8.dp, bottom = 16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             Box(
                 modifier = Modifier
                     .size(64.dp)
                     .clip(CircleShape)
-                    .background(SoftRose)
-                    .border(2.dp, RosePrimary, CircleShape),
+                    .background(PookieCardLight)
+                    .border(2.dp, PookiePinkPrimary, CircleShape),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = userProfile.name.take(1).uppercase(),
                     fontSize = 28.sp,
                     fontWeight = FontWeight.Bold,
-                    color = RosePrimary
+                    color = PookiePinkPrimary
                 )
             }
             Spacer(modifier = Modifier.width(16.dp))
             Column {
-                Text(userProfile.name, fontSize = 22.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
-                Text("${userProfile.occupation} • ${userProfile.weightKg.toInt()} kg", fontSize = 13.sp, color = TextSecondary)
-                Text("Goal: ${userProfile.fitnessGoal}", fontSize = 12.sp, color = RosePrimary)
+                Text(userProfile.name, fontSize = 22.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                Text("${userProfile.occupation} • ${userProfile.weightKg.toInt()} kg", fontSize = 13.sp, color = PookieTextMuted)
+                Text("Goal: ${userProfile.fitnessGoal}", fontSize = 12.sp, color = PookiePinkGlow)
             }
         }
-
-        Spacer(modifier = Modifier.height(20.dp))
 
         // Sub-navigation selector tabs
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(14.dp))
-                .background(CreamCard)
-                .border(1.dp, PeachBorder, RoundedCornerShape(14.dp))
+                .background(PookieCardBg)
                 .padding(4.dp)
         ) {
             listOf("Profile", "Safety & SOS", "Memories", "Women's Health", "Watch Demo").forEach { tab ->
@@ -90,7 +92,7 @@ fun ProfileScreen(
                     modifier = Modifier
                         .weight(1f)
                         .clip(RoundedCornerShape(10.dp))
-                        .background(if (isSelected) RosePrimary else Color.Transparent)
+                        .background(if (isSelected) PookiePinkPrimary else Color.Transparent)
                         .clickable { selectedSubSection = tab }
                         .padding(vertical = 8.dp),
                     contentAlignment = Alignment.Center
@@ -99,7 +101,8 @@ fun ProfileScreen(
                         text = tab,
                         fontSize = 10.sp,
                         fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                        color = if (isSelected) Color.White else TextMuted
+                        color = if (isSelected) Color.White else PookieTextMuted,
+                        maxLines = 1
                     )
                 }
             }
@@ -141,24 +144,30 @@ fun SafetyTabDetails(
     var statusMessage by remember { mutableStateOf<String?>(null) }
 
     Column {
-        Text("Women Safety & Emergency Shield 🛡️", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
-        Text("Quick safe-exit fake calls and automatic Telegram SOS alerts with live location", fontSize = 12.sp, color = TextSecondary)
+        Text("Women Safety & Emergency Shield 🛡️", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.White)
+        Text("Quick safe-exit fake calls and automatic Telegram SOS alerts with live location", fontSize = 12.sp, color = PookieTextMuted)
 
         Spacer(modifier = Modifier.height(16.dp))
 
         // 1. FAKE CALL CONFIGURATION
-        GlassCard(modifier = Modifier.fillMaxWidth()) {
-            Column(modifier = Modifier.padding(18.dp)) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(20.dp))
+                .background(PookieCardBg)
+                .padding(18.dp)
+        ) {
+            Column {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.Call, contentDescription = null, tint = RosePrimary, modifier = Modifier.size(22.dp))
+                    Icon(Icons.Default.Call, contentDescription = null, tint = PookiePinkPrimary, modifier = Modifier.size(22.dp))
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Safe Exit Fake Call Trigger", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
+                    Text("Safe Exit Fake Call Trigger", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = Color.White)
                 }
                 Spacer(modifier = Modifier.height(6.dp))
                 Text(
                     "Pressing this trigger rings your phone with an incoming call screen so you can excuse yourself and leave uncomfortable situations safely.",
                     fontSize = 12.sp,
-                    color = TextSecondary,
+                    color = PookieTextMuted,
                     lineHeight = 16.sp
                 )
 
@@ -167,10 +176,16 @@ fun SafetyTabDetails(
                 OutlinedTextField(
                     value = fakeCallerName,
                     onValueChange = { fakeCallerName = it },
-                    label = { Text("Caller Name on Screen") },
+                    label = { Text("Caller Name on Screen", color = PookieTextMuted) },
                     placeholder = { Text("e.g. Bada Bhai ❤️, Mom, Papa") },
                     modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(10.dp)
+                    shape = RoundedCornerShape(10.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = Color.White,
+                        unfocusedTextColor = Color.White,
+                        focusedContainerColor = PookieCardLight,
+                        unfocusedContainerColor = PookieCardLight
+                    )
                 )
 
                 Spacer(modifier = Modifier.height(10.dp))
@@ -178,17 +193,23 @@ fun SafetyTabDetails(
                 OutlinedTextField(
                     value = fakeCallerNumber,
                     onValueChange = { fakeCallerNumber = it },
-                    label = { Text("Caller Phone Number") },
+                    label = { Text("Caller Phone Number", color = PookieTextMuted) },
                     placeholder = { Text("e.g. +91 98765 43210") },
                     modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(10.dp)
+                    shape = RoundedCornerShape(10.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = Color.White,
+                        unfocusedTextColor = Color.White,
+                        focusedContainerColor = PookieCardLight,
+                        unfocusedContainerColor = PookieCardLight
+                    )
                 )
 
                 Spacer(modifier = Modifier.height(14.dp))
 
                 Button(
                     onClick = onTriggerFakeCall,
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2C3E50)),
+                    colors = ButtonDefaults.buttonColors(containerColor = PookieCardLight),
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(10.dp)
                 ) {
@@ -202,18 +223,24 @@ fun SafetyTabDetails(
         Spacer(modifier = Modifier.height(16.dp))
 
         // 2. TELEGRAM EMERGENCY SOS BROADCAST
-        GlassCard(modifier = Modifier.fillMaxWidth()) {
-            Column(modifier = Modifier.padding(18.dp)) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(20.dp))
+                .background(PookieCardBg)
+                .padding(18.dp)
+        ) {
+            Column {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Default.Warning, contentDescription = null, tint = Color(0xFFE53935), modifier = Modifier.size(22.dp))
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Telegram SOS Live Location Alert", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
+                    Text("Telegram SOS Live Location Alert", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = Color.White)
                 }
                 Spacer(modifier = Modifier.height(6.dp))
                 Text(
                     "When you type \"unsafe\" / \"emergency\" in NYRA Chat or tap SOS, HerRhythm instantly fetches your GPS coordinates and broadcasts an SOS map alert to your Telegram chat/group.",
                     fontSize = 12.sp,
-                    color = TextSecondary,
+                    color = PookieTextMuted,
                     lineHeight = 16.sp
                 )
 
@@ -222,10 +249,16 @@ fun SafetyTabDetails(
                 OutlinedTextField(
                     value = botToken,
                     onValueChange = { botToken = it },
-                    label = { Text("Telegram Bot Token") },
+                    label = { Text("Telegram Bot Token", color = PookieTextMuted) },
                     placeholder = { Text("e.g. 123456789:ABCdefGhIJKlmNoPQ") },
                     modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(10.dp)
+                    shape = RoundedCornerShape(10.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = Color.White,
+                        unfocusedTextColor = Color.White,
+                        focusedContainerColor = PookieCardLight,
+                        unfocusedContainerColor = PookieCardLight
+                    )
                 )
 
                 Spacer(modifier = Modifier.height(10.dp))
@@ -233,10 +266,16 @@ fun SafetyTabDetails(
                 OutlinedTextField(
                     value = chatId,
                     onValueChange = { chatId = it },
-                    label = { Text("Telegram Chat ID / Group ID") },
+                    label = { Text("Telegram Chat ID / Group ID", color = PookieTextMuted) },
                     placeholder = { Text("e.g. 987654321 or -100123456789") },
                     modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(10.dp)
+                    shape = RoundedCornerShape(10.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = Color.White,
+                        unfocusedTextColor = Color.White,
+                        focusedContainerColor = PookieCardLight,
+                        unfocusedContainerColor = PookieCardLight
+                    )
                 )
 
                 Spacer(modifier = Modifier.height(10.dp))
@@ -244,10 +283,16 @@ fun SafetyTabDetails(
                 OutlinedTextField(
                     value = emergencyContactPhone,
                     onValueChange = { emergencyContactPhone = it },
-                    label = { Text("Emergency Phone Number") },
+                    label = { Text("Emergency Phone Number", color = PookieTextMuted) },
                     placeholder = { Text("e.g. 112 or Family Mobile") },
                     modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(10.dp)
+                    shape = RoundedCornerShape(10.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = Color.White,
+                        unfocusedTextColor = Color.White,
+                        focusedContainerColor = PookieCardLight,
+                        unfocusedContainerColor = PookieCardLight
+                    )
                 )
 
                 Spacer(modifier = Modifier.height(14.dp))
@@ -290,7 +335,7 @@ fun SafetyTabDetails(
                             onUpdateSettings(updated)
                             statusMessage = "Settings saved to phone memory! 💾"
                         },
-                        colors = ButtonDefaults.buttonColors(containerColor = RosePrimary),
+                        colors = ButtonDefaults.buttonColors(containerColor = PookiePinkPrimary),
                         modifier = Modifier.weight(1f),
                         shape = RoundedCornerShape(10.dp)
                     ) {
@@ -304,7 +349,7 @@ fun SafetyTabDetails(
                         text = statusMessage!!,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.SemiBold,
-                        color = RosePrimary
+                        color = PookiePinkGlow
                     )
                 }
             }
@@ -315,11 +360,17 @@ fun SafetyTabDetails(
 @Composable
 fun ProfileTabDetails(userProfile: UserProfile) {
     Column {
-        Text("Personal Information", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
+        Text("Personal Information", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.White)
         Spacer(modifier = Modifier.height(12.dp))
 
-        GlassCard(modifier = Modifier.fillMaxWidth()) {
-            Column(modifier = Modifier.padding(16.dp)) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(20.dp))
+                .background(PookieCardBg)
+                .padding(16.dp)
+        ) {
+            Column {
                 ProfileInfoRow(label = "Full Name", value = userProfile.name)
                 ProfileInfoRow(label = "Date of Birth", value = userProfile.dateOfBirth)
                 ProfileInfoRow(label = "Weight", value = "${userProfile.weightKg.toInt()} kg")
@@ -345,7 +396,7 @@ fun MemoriesTabDetails(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("NYRA Long-Term Memory", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
+            Text("NYRA Long-Term Memory", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.White)
             if (memories.isNotEmpty()) {
                 TextButton(onClick = onClearMemories) {
                     Text("Clear All", color = HealthRed, fontSize = 12.sp)
@@ -357,32 +408,44 @@ fun MemoriesTabDetails(
         Text(
             "NYRA remembers relevant details you mention so conversations stay personal.",
             fontSize = 12.sp,
-            color = TextSecondary
+            color = PookieTextMuted
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
         if (memories.isEmpty()) {
-            GlassCard(modifier = Modifier.fillMaxWidth()) {
-                Box(modifier = Modifier.padding(24.dp).fillMaxWidth(), contentAlignment = Alignment.Center) {
-                    Text("No memories stored yet. Chat with NYRA to build memory! 🌸", fontSize = 13.sp, color = TextMuted)
-                }
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(18.dp))
+                    .background(PookieCardBg)
+                    .padding(24.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text("No memories stored yet. Chat with NYRA to build memory! 🌸", fontSize = 13.sp, color = PookieTextMuted)
             }
         } else {
             memories.forEach { memory ->
-                GlassCard(modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(PookieCardBg)
+                        .padding(bottom = 8.dp)
+                        .padding(14.dp)
+                ) {
                     Row(
-                        modifier = Modifier.padding(14.dp).fillMaxWidth(),
+                        modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Column(modifier = Modifier.weight(1f)) {
-                            Text(memory.category, fontSize = 11.sp, fontWeight = FontWeight.Bold, color = RosePrimary)
-                            Text(memory.content, fontSize = 13.sp, color = TextPrimary)
-                            Text(memory.dateAdded, fontSize = 10.sp, color = TextMuted)
+                            Text(memory.category, fontSize = 11.sp, fontWeight = FontWeight.Bold, color = PookiePinkGlow)
+                            Text(memory.content, fontSize = 13.sp, color = Color.White)
+                            Text(memory.dateAdded, fontSize = 10.sp, color = PookieTextMuted)
                         }
                         IconButton(onClick = { onDeleteMemory(memory.id) }) {
-                            Icon(Icons.Default.Delete, contentDescription = "Delete", tint = TextMuted, modifier = Modifier.size(18.dp))
+                            Icon(Icons.Default.Delete, contentDescription = "Delete", tint = PookieTextMuted, modifier = Modifier.size(18.dp))
                         }
                     }
                 }
@@ -396,29 +459,33 @@ fun WomensHealthTabDetails(userProfile: UserProfile, onTogglePregnancyMode: (Boo
     var pregnancyMode by remember { mutableStateOf(userProfile.isPregnancyModeEnabled) }
 
     Column {
-        Text("Women's Health Modes", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
+        Text("Women's Health Modes", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.White)
         Spacer(modifier = Modifier.height(12.dp))
 
-        GlassCard(modifier = Modifier.fillMaxWidth()) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text("Pregnancy Mode 🤰", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
-                        Text("Adapts cycle predictions for gestational tracking & kick counting", fontSize = 11.sp, color = TextSecondary)
-                    }
-                    Switch(
-                        checked = pregnancyMode,
-                        onCheckedChange = {
-                            pregnancyMode = it
-                            onTogglePregnancyMode(it)
-                        },
-                        colors = SwitchDefaults.colors(checkedThumbColor = RosePrimary, checkedTrackColor = SoftRose)
-                    )
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(20.dp))
+                .background(PookieCardBg)
+                .padding(16.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text("Pregnancy Mode 🤰", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                    Text("Adapts cycle predictions for gestational tracking & kick counting", fontSize = 11.sp, color = PookieTextMuted)
                 }
+                Switch(
+                    checked = pregnancyMode,
+                    onCheckedChange = {
+                        pregnancyMode = it
+                        onTogglePregnancyMode(it)
+                    },
+                    colors = SwitchDefaults.colors(checkedThumbColor = Color.White, checkedTrackColor = PookiePinkPrimary)
+                )
             }
         }
     }
@@ -429,25 +496,31 @@ fun WatchDemoTabDetails(repository: HealthSensorRepository) {
     val snapshot by repository.liveSnapshot.collectAsState()
 
     Column {
-        Text("Smartwatch Status & Sensor Simulator", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
+        Text("Smartwatch Status & Sensor Simulator", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.White)
         Spacer(modifier = Modifier.height(12.dp))
 
-        GlassCard(modifier = Modifier.fillMaxWidth()) {
-            Column(modifier = Modifier.padding(18.dp)) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(20.dp))
+                .background(PookieCardBg)
+                .padding(18.dp)
+        ) {
+            Column {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Column {
-                        Text("HerRhythm Companion Watch", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
+                        Text("HerRhythm Companion Watch", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
                         Text(if (snapshot.isWatchConnected) "Connected via BLE (Simulated)" else "Disconnected", fontSize = 12.sp, color = if (snapshot.isWatchConnected) HealthGreen else HealthOrange)
                     }
-                    Text("Battery: 88%", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = RosePrimary)
+                    Text("Battery: 88%", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = PookiePinkGlow)
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
-                Text("Simulate Hardware Sensor Events:", fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = TextSecondary)
+                Text("Simulate Hardware Sensor Events:", fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = PookieTextMuted)
                 Spacer(modifier = Modifier.height(10.dp))
 
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -461,7 +534,7 @@ fun WatchDemoTabDetails(repository: HealthSensorRepository) {
 
                     Button(
                         onClick = { repository.triggerSimulatedWorkoutMode() },
-                        colors = ButtonDefaults.buttonColors(containerColor = RosePrimary),
+                        colors = ButtonDefaults.buttonColors(containerColor = PookiePinkPrimary),
                         modifier = Modifier.weight(1f)
                     ) {
                         Text("Workout Mode", fontSize = 11.sp, color = Color.White)
@@ -488,7 +561,7 @@ fun ProfileInfoRow(label: String, value: String) {
             .padding(vertical = 8.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(label, fontSize = 13.sp, color = TextMuted)
-        Text(value, fontSize = 13.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
+        Text(label, fontSize = 13.sp, color = PookieTextMuted)
+        Text(value, fontSize = 13.sp, fontWeight = FontWeight.Bold, color = Color.White)
     }
 }

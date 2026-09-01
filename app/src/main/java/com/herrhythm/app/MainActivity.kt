@@ -134,13 +134,12 @@ fun MainAppContainer(
         mutableStateOf(storageManager.getSafetySettings())
     }
 
-    var selectedTab by remember { mutableStateOf("Today") } // Today, Calendar, Self Care, Analysis, NYRA, Settings
+    var selectedTab by remember { mutableStateOf("Today") } // Today, Programs, Care, Analysis, NYRA, Health, Calendar, Profile
     var activeRunningSession by remember { mutableStateOf<WorkoutSession?>(null) }
     var showLogPeriodDialog by remember { mutableStateOf(false) }
     var showGynaecologistScreen by remember { mutableStateOf(false) }
     var showFakeCallScreen by remember { mutableStateOf(false) }
     var showQuickActionSheet by remember { mutableStateOf(false) }
-    var showSettingsScreen by remember { mutableStateOf(false) }
 
     val coroutineScope = rememberCoroutineScope()
     val context = androidx.compose.ui.platform.LocalContext.current
@@ -300,6 +299,19 @@ fun MainAppContainer(
                     ) {
                         Text("👩‍⚕️ Consult Gynaecologists", color = Color.White, fontWeight = FontWeight.Bold)
                     }
+
+                    // Calendar
+                    Button(
+                        onClick = {
+                            showQuickActionSheet = false
+                            selectedTab = "Calendar"
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = PookieCardLight),
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("📅 Open Cycle Calendar", color = Color.White, fontWeight = FontWeight.Bold)
+                    }
                 }
             },
             confirmButton = {
@@ -378,22 +390,22 @@ fun MainAppContainer(
                             Text("Today", fontSize = 10.sp, color = if (isToday) PookiePinkPrimary else PookieTextMuted, fontWeight = if (isToday) FontWeight.Bold else FontWeight.Normal)
                         }
 
-                        // 2. Calendar
-                        val isCalendar = selectedTab == "Calendar"
+                        // 2. Programs / Fitness
+                        val isPrograms = selectedTab == "Programs"
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
                             modifier = Modifier
-                                .clickable { selectedTab = "Calendar" }
+                                .clickable { selectedTab = "Programs" }
                                 .padding(horizontal = 8.dp, vertical = 4.dp)
                         ) {
                             Icon(
-                                Icons.Default.CalendarMonth,
-                                contentDescription = "Calendar",
-                                tint = if (isCalendar) PookiePinkPrimary else PookieTextMuted,
+                                Icons.Default.FitnessCenter,
+                                contentDescription = "Programs",
+                                tint = if (isPrograms) PookiePinkPrimary else PookieTextMuted,
                                 modifier = Modifier.size(24.dp)
                             )
                             Spacer(modifier = Modifier.height(2.dp))
-                            Text("Calendar", fontSize = 10.sp, color = if (isCalendar) PookiePinkPrimary else PookieTextMuted, fontWeight = if (isCalendar) FontWeight.Bold else FontWeight.Normal)
+                            Text("Programs", fontSize = 10.sp, color = if (isPrograms) PookiePinkPrimary else PookieTextMuted, fontWeight = if (isPrograms) FontWeight.Bold else FontWeight.Normal)
                         }
 
                         // 3. CENTER BIG FLOATING '+' BUTTON
@@ -410,22 +422,22 @@ fun MainAppContainer(
                             Icon(Icons.Default.Add, contentDescription = "Add", tint = Color.White, modifier = Modifier.size(28.dp))
                         }
 
-                        // 4. Self Care
-                        val isSelfCare = selectedTab == "Self Care"
+                        // 4. Care / Gynaecologist
+                        val isCare = selectedTab == "Care"
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
                             modifier = Modifier
-                                .clickable { selectedTab = "Self Care" }
+                                .clickable { selectedTab = "Care" }
                                 .padding(horizontal = 8.dp, vertical = 4.dp)
                         ) {
                             Icon(
                                 Icons.Default.Favorite,
-                                contentDescription = "Self Care",
-                                tint = if (isSelfCare) PookiePinkPrimary else PookieTextMuted,
+                                contentDescription = "Care",
+                                tint = if (isCare) PookiePinkPrimary else PookieTextMuted,
                                 modifier = Modifier.size(24.dp)
                             )
                             Spacer(modifier = Modifier.height(2.dp))
-                            Text("Self Care", fontSize = 10.sp, color = if (isSelfCare) PookiePinkPrimary else PookieTextMuted, fontWeight = if (isSelfCare) FontWeight.Bold else FontWeight.Normal)
+                            Text("Care 👩‍⚕️", fontSize = 10.sp, color = if (isCare) PookiePinkPrimary else PookieTextMuted, fontWeight = if (isCare) FontWeight.Bold else FontWeight.Normal)
                         }
 
                         // 5. Analysis
@@ -465,7 +477,8 @@ fun MainAppContainer(
                         healthSnapshot = liveSnapshot,
                         reminders = activeReminders,
                         onOpenNyraChat = { selectedTab = "NYRA" },
-                        onOpenHealthDetail = { selectedTab = "Analysis" },
+                        onOpenHealthDetail = { selectedTab = "Health" },
+                        onOpenFitness = { selectedTab = "Programs" },
                         onOpenWatchManager = { selectedTab = "Profile" },
                         onOpenGynaecologists = { showGynaecologistScreen = true },
                         onOpenLogPeriodDialog = { showLogPeriodDialog = true },
@@ -482,11 +495,7 @@ fun MainAppContainer(
                             }
                         }
                     )
-                    "Calendar" -> CalendarScreen(
-                        cycleInfo = cycleRepository.getCycleInfo(),
-                        onBackClick = { selectedTab = "Today" }
-                    )
-                    "Self Care" -> FitnessScreen(
+                    "Programs" -> FitnessScreen(
                         snapshot = liveSnapshot,
                         fitnessRepository = fitnessRepository,
                         onStartWorkout = { session -> activeRunningSession = session },
@@ -494,6 +503,17 @@ fun MainAppContainer(
                             nyraEngine.sendMessage("Generate a custom 30 min workout plan for my current energy level")
                             selectedTab = "NYRA"
                         }
+                    )
+                    "Care" -> GynaecologistScreen(
+                        doctorRepository = doctorRepository,
+                        onBack = { selectedTab = "Today" }
+                    )
+                    "Calendar" -> CalendarScreen(
+                        cycleInfo = cycleRepository.getCycleInfo(),
+                        onBackClick = { selectedTab = "Today" }
+                    )
+                    "Health" -> HealthScreen(
+                        snapshot = liveSnapshot
                     )
                     "Analysis" -> AnalysisScreen(
                         userProfile = userProfile,
